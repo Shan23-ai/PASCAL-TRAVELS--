@@ -2469,3 +2469,343 @@ button { font-family: inherit; cursor: pointer; border: none; }
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
+
+/* ===== NEW FORM VIEWS STYLING ===== */
+.apply-form-view, .visa-form-view, .agent-login-view {
+  padding: 3rem 0;
+  background: linear-gradient(135deg, var(--skyblue-pale), var(--skyblue-soft));
+  min-height: 100vh;
+}
+
+.apply-form-card, .visa-form-card, .agent-login-card {
+  max-width: 700px;
+  margin: 2rem auto;
+  border: 2px solid rgba(79,179,217,0.3);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--skyblue-soft);
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 1.5rem;
+}
+
+.form-section h3 {
+  color: var(--skyblue-navy);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-field {
+  margin-bottom: 1.2rem;
+}
+
+.form-field label {
+  display: block;
+  font-weight: 600;
+  color: var(--skyblue-navy);
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="tel"],
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--skyblue-soft);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: rgba(255,255,255,0.7);
+  color: var(--text-dark);
+  transition: all 0.2s;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--skyblue-deep);
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 0 0 3px rgba(79,179,217,0.1);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.form-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.radio-label, .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 400;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.radio-label input, .checkbox-label input {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--skyblue-deep);
+}
+
+.file-upload {
+  position: relative;
+  border: 2px dashed var(--skyblue-deep);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(135,206,235,0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.file-upload:hover {
+  background: rgba(135,206,235,0.1);
+  border-color: var(--skyblue);
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-upload-hint {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
+}
+
+.alert {
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.alert-red {
+  background: rgba(229, 62, 62, 0.1);
+  border-left: 4px solid var(--red);
+  color: var(--red);
+}
+
+.alert-info {
+  background: rgba(79,179,217,0.1);
+  border-left: 4px solid var(--skyblue-deep);
+  color: var(--skyblue-navy);
+}
+
+.alert-success {
+  background: rgba(66, 160, 71, 0.1);
+  border-left: 4px solid #42A047;
+  color: #42A047;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--golden), var(--golden-soft));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-red {
+  color: var(--red);
+}
+
+/* ===== CURSOR TRAIL ===== */
+.cursor-trail {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: var(--skyblue-deep);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.7;
+  box-shadow: 0 0 8px rgba(79,179,217,0.6);
+}
+
+/* ===== NAVIGATION DROPDOWN ===== */
+.nav-agent-dropdown {
+  position: relative;
+}
+
+.nav-agent-dropdown > a::after {
+  content: ' ▼';
+  font-size: 0.6rem;
+}
+
+.agent-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--white);
+  border: 1px solid var(--skyblue-soft);
+  border-radius: var(--radius-md);
+  min-width: 180px;
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  box-shadow: var(--shadow-soft);
+  z-index: 100;
+  list-style: none;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+
+.agent-submenu li {
+  list-style: none;
+}
+
+.agent-submenu li a {
+  display: block;
+  padding: 0.6rem 1.2rem;
+  color: var(--text-dark);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.agent-submenu li a:hover {
+  background: var(--skyblue-pale);
+  color: var(--skyblue-navy);
+}
+
+.nav-agent-dropdown:hover .agent-submenu {
+  display: flex;
+}
+
+/* ===== OVAL JOB CARDS FOR SWIPER ===== */
+.job-card-oval {
+  background: var(--white);
+  border-radius: 50px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(135,206,235,0.18);
+  transition: all 0.3s var(--ease);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  aspect-ratio: 3/4;
+  cursor: pointer;
+}
+
+.job-card-oval:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(79,179,217,0.2);
+  border-color: var(--golden);
+}
+
+.job-card-img {
+  width: 100%;
+  height: 180px;
+  border-radius: 40px;
+  object-fit: cover;
+  background: linear-gradient(135deg, var(--skyblue-soft), var(--golden-soft));
+}
+
+.job-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--skyblue-navy);
+  margin: 0;
+}
+
+.job-card-country {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.job-card-pricing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.job-card-price-current {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--golden);
+}
+
+.job-card-price-original {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.job-card-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* ===== SWIPER CUSTOMIZATION ===== */
+.swiper {
+  width: 100%;
+  padding: 2rem 0;
+}
+
+.swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swiper-pagination-bullet {
+  background: var(--skyblue-deep);
+  opacity: 0.6;
+}
+
+.swiper-pagination-bullet-active {
+  background: var(--golden);
+  opacity: 1;
+}
+
+.swiper-button-next, .swiper-button-prev {
+  color: var(--skyblue-deep);
+}
+
+.swiper-button-next:after, .swiper-button-prev:after {
+  font-size: 1.5rem;
+}
+
+/* ===== RESPONSIVE FORMS ===== */
+@media (max-width: 600px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .apply-form-view, .visa-form-view, .agent-login-view {
+    padding: 1.5rem 0;
+  }
+
+  .apply-form-card, .visa-form-card, .agent-login-card {
+    margin: 1rem auto;
+  }
+}

@@ -6,6 +6,8 @@
   <meta name="description" content="Trusted visa, work, study, Canada PR, and East Africa tour services with fast support and expert guidance." />
   <title>Pascal Travels & Tour — Explore the World with Confidence</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Swiper.js CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 </head>
 <body>
   <main id="app-root" class="app-root">
@@ -22,16 +24,21 @@
         </button>
         <ul id="nav-links" class="nav-links">
           <li><a href="#" data-nav="home">Home</a></li>
-          <li><a href="#" data-nav="services">Services</a></li>
-          <li><a href="#" data-nav="destinations">Destinations</a></li>
+          <li><a href="#" data-nav="destinations">Travel Packages</a></li>
           <li><a href="#" data-nav="jobs" data-view="jobs">Jobs</a></li>
-          <li><a href="#" data-nav="visa-application">Visa Application</a></li>
-          <li><a href="#" data-nav="partner" data-view="agent-register">Partner</a></li>
+          <li><a href="#" data-nav="visa-application" data-view="visa-application-form">Visa Application</a></li>
+          <li class="nav-agent-dropdown">
+            <a href="#">Agent</a>
+            <ul class="agent-submenu">
+              <li><a href="#" data-nav="agent-register" data-view="agent-register">Register</a></li>
+              <li><a href="#" data-nav="agent-login" data-view="agent-login">Login</a></li>
+            </ul>
+          </li>
           <li><a href="#" data-nav="contact">Contact</a></li>
         </ul>
         <div class="nav-cta-group">
-          <button class="btn btn-outline-nav btn-sm" data-nav="jobs" data-view="jobs">Apply Free</button>
-          <button id="nav-cta" class="btn btn-gold btn-sm" data-nav="visa-application">Visa Application</button>
+          <button class="btn btn-outline-nav btn-sm" data-nav="jobs" data-view="jobs">Explore Jobs</button>
+          <button id="nav-cta" class="btn btn-gold btn-sm" data-nav="visa-application" data-view="visa-application-form">Visa Application</button>
         </div>
       </div>
     </nav>
@@ -79,13 +86,13 @@
           </p>
           <div class="hero-ctas hero-ctas-pascal">
             <button class="btn btn-gold btn-lg btn-shadow" data-nav="jobs" data-view="jobs">
-              🚀 Apply Now for Free
+              🚀 Explore Jobs
             </button>
-            <button class="btn btn-red btn-lg btn-shadow" data-nav="visa-application">
+            <button class="btn btn-red btn-lg btn-shadow" data-nav="visa-application" data-view="visa-application-form">
               🛂 Visa Application
             </button>
             <button class="btn btn-outline-white btn-lg" data-nav="destinations">
-              🌍 Browse Destinations
+              🌍 Travel Packages
             </button>
             <button class="btn btn-outline-white btn-lg" onclick="window.location.href='tel:+254753731136'">
               📞 Call Now
@@ -375,199 +382,13 @@
         </div>
       </section>
 
-      <!-- WHY CHOOSE PASCAL + CORE VALUES + TARGET CLIENTS -->
-      <section class="section section-light">
-        <div class="container">
-          <div class="section-header">
-            <span class="eyebrow text-gold">WHY PASCAL TOURS & TRAVELS</span>
-            <h2 class="section-title">Six Reasons Clients <span class="text-accent-red">Trust Us.</span></h2>
-          </div>
-          <div class="grid grid-3 why-choose">
-            <div class="wc-card">✅ Exceptional & personalized service</div>
-            <div class="wc-card">✅ Transparent processes & clear communication</div>
-            <div class="wc-card">✅ Dedicated support at every stage of your journey</div>
-            <div class="wc-card">✅ In-depth expertise in international travel & visa requirements</div>
-            <div class="wc-card">✅ Unwavering commitment to integrity & client satisfaction</div>
-            <div class="wc-card">✅ Dependable guidance for work, study, and travel abroad</div>
-          </div>
 
-          <!-- CORE VALUES TABLE -->
-          <div class="section-header" style="margin-top:3.5rem;">
-            <span class="eyebrow text-skyblue-deep">OUR CORE VALUES</span>
-            <h3 class="section-title">The Five <span class="text-gold-gradient">Pillars</span> of Everything We Do.</h3>
-          </div>
-          <div class="card card-white values-card">
-            <table class="values-table">
-              <thead>
-                <tr><th style="width:28%;">Core Value</th><th>What It Means For You</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><span class="value-dot" style="background:#1E88E5;"></span> Integrity</td><td>Highest standards of honesty, transparency, and ethical practices — every time.</td></tr>
-                <tr><td><span class="value-dot" style="background:#FFD700;"></span> Excellence</td><td>Relentless pursuit of quality. We don't stop until we exceed your expectations.</td></tr>
-                <tr><td><span class="value-dot" style="background:#0B2E69;"></span> Professionalism</td><td>High standards in every aspect of our work — documents, communication & delivery.</td></tr>
-                <tr><td><span class="value-dot" style="background:#E53E3E;"></span> Reliability</td><td>Trusted for dependable guidance and unwavering support when you need it most.</td></tr>
-                <tr><td><span class="value-dot" style="background:#43A047;"></span> Customer Focus</td><td>Client goals, needs, and successes are always at the heart of our operations.</td></tr>
-              </tbody>
-            </table>
-          </div>
 
-          <!-- TARGET CLIENTS -->
-          <div class="section-header" style="margin-top:3.5rem;">
-            <span class="eyebrow text-accent-red">OUR TARGET CLIENTS</span>
-            <h3 class="section-title">Who We <span class="text-gold-gradient">Serve.</span></h3>
-          </div>
-          <div class="grid grid-3 target-grid">
-            <div class="t-card"><div class="t-icon">👷</div><p><strong>Individuals</strong> seeking overseas employment opportunities.</p></div>
-            <div class="t-card"><div class="t-icon">🛠️</div><p><strong>Skilled & unskilled workers</strong> ready to advance their careers abroad.</p></div>
-            <div class="t-card"><div class="t-icon">🎓</div><p><strong>Students</strong> aspiring for international education overseas.</p></div>
-            <div class="t-card"><div class="t-icon">💼</div><p><strong>Professionals</strong> looking for career advancement abroad.</p></div>
-            <div class="t-card"><div class="t-icon">✈️</div><p><strong>Travelers</strong> needing expert visa and travel support services.</p></div>
-            <div class="t-card"><div class="t-icon">🌍</div><p><strong>Families</strong> planning emigration, PR, or once-in-a-lifetime tours.</p></div>
-          </div>
-        </div>
-      </section>
 
-      <!-- ============= CEO PROFILE SECTION ============= -->
-      <section class="section section-dark" id="ceo">
-        <div class="container">
-          <div class="section-header">
-            <span class="eyebrow text-gold-gradient">MEET OUR LEADERSHIP</span>
-            <h2 class="section-title text-white">A Message From Our <span class="text-gold-gradient">Founder & CEO.</span></h2>
-            <p class="section-sub text-white-op">The vision behind Pascal Travels & Tour.</p>
-          </div>
-          <div class="glass-card ceo-card">
-            <div class="ceo-grid">
-              <div class="ceo-photo-col">
-                <div class="ceo-photo" id="ceo-photo">
-                  <div class="ceo-photo-inner">
-                    <img src="assets/ceo-head.jpeg" alt="Mr. Pascal, Founder &amp; CEO" class="ceo-photo-img" />
-                    <span class="ceo-photo-label">Mr. Pascal</span>
-                  </div>
-                </div>
-                <div class="ceo-socials">
-                  <span>📘</span><span>💼</span><span>📹</span>
-                </div>
-              </div>
-              <div class="ceo-content">
-                <div class="ceo-name-wrap">
-                  <h3 class="ceo-name text-gold-gradient">Mr. Pascal</h3>
-                  <div class="ceo-title">Founder &amp; CEO</div>
-                </div>
-                <div class="ceo-glowing-line"></div>
-                <p class="ceo-bio">
-                  Founder &amp; CEO of <strong>Pascal Travels &amp; Tour</strong> — 12+ years in the travel and
-                  visa industry, helping hundreds of Kenyans study, work, and live abroad.
-                </p>
-                <blockquote class="ceo-quote">
-                  "Borders should never be barriers to opportunity. We guide you from first inquiry to
-                  arrival abroad — turning Kenyan dreams into reality."
-                </blockquote>
-                <div class="ceo-values">
-                  <div class="ceo-mission">
-                    <h5>🎯 Mission</h5>
-                    <p>Trusted, reliable, and affordable travel &amp; visa services for Kenyans seeking opportunities abroad.</p>
-                  </div>
-                  <div class="ceo-values-list">
-                    <h5>⭐ Core Values</h5>
-                    <div class="value-chips">
-                      <span>Integrity</span>
-                      <span>Reliability</span>
-                      <span>Customer-Centricity</span>
-                      <span>Excellence</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- TESTIMONIALS -->
-      <!-- PARTNER WITH US SECTION -->
-      <section class="section section-light" id="partner-with-us">
-        <div class="container">
-          <div class="section-header">
-            <span class="eyebrow text-gold">BUILD WEALTH WITH US</span>
-            <h2 class="section-title">Partner With <span class="text-gold-gradient">Pascal Travels & Tours</span></h2>
-            <p class="section-sub">Join our growing network of agents earning competitive commissions while helping candidates find their dream jobs and visas abroad.</p>
-          </div>
-          
-          <div class="grid grid-3 partner-benefits">
-            <div class="benefit-card glass-card">
-              <div class="benefit-icon">💰</div>
-              <h3>Lucrative Commissions</h3>
-              <p>Earn attractive commissions on every successful placement or visa application. Scale your income as you grow.</p>
-            </div>
-            <div class="benefit-card glass-card">
-              <div class="benefit-icon">🤝</div>
-              <h3>Dedicated Support</h3>
-              <p>Our team provides marketing materials, training, and ongoing support to help you succeed in your agency business.</p>
-            </div>
-            <div class="benefit-card glass-card">
-              <div class="benefit-icon">🌍</div>
-              <h3>Global Network</h3>
-              <p>Access to opportunities in 59+ countries and partnerships with leading employers, universities, and visa consultants.</p>
-            </div>
-            <div class="benefit-card glass-card">
-              <div class="benefit-icon">📊</div>
-              <h3>Real-Time Dashboard</h3>
-              <p>Track your candidates, commissions, and performance metrics in our easy-to-use agent portal.</p>
-            </div>
-            <div class="benefit-card glass-card">
-              <div class="benefit-icon">🎓</div>
-              <h3>Regular Training</h3>
-              <p>Stay updated with webinars, certification programs, and industry knowledge from our expert team.</p>
-            </div>
-            <div class="benefit-card glass-card">
-              <div class="benefit-icon">✨</div>
-              <h3>Premium Tools</h3>
-              <p>Professional website templates, marketing assets, and branding materials to launch your agency quickly.</p>
-            </div>
-          </div>
 
-          <div class="partner-cta-section">
-            <h3 class="partner-cta-title">Ready to become a Partner?</h3>
-            <p class="partner-cta-sub">Sign up as an agent in minutes and start earning commissions immediately.</p>
-            <button class="btn btn-gold btn-lg btn-shadow" data-nav="partner" data-view="agent-register">
-              🤝 Sign Up as an Agent
-            </button>
-          </div>
-        </div>
-      </section>
 
-      <!-- FAQ SECTION -->
-      <section class="section section-sky" id="faq">
-        <div class="container">
-          <div class="section-header">
-            <span class="eyebrow text-white-op">QUESTIONS & ANSWERS</span>
-            <h2 class="section-title text-white">Frequently Asked <span class="text-gold-gradient">Questions</span></h2>
-            <p class="section-sub text-white-op">Everything you need to know about our services and processes.</p>
-          </div>
-          <div class="faq-list">
-            <div class="faq-item">
-              <button class="faq-question">How long does the visa application process take? <span class="faq-icon">+</span></button>
-              <div class="faq-answer"><p>Processing times vary by destination and visa type. Tourist visas typically take 7-15 business days, work visas 2-6 weeks, and study visas 4-8 weeks. We provide regular updates throughout the process.</p></div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">What documents do I need for a visa application? <span class="faq-icon">+</span></button>
-              <div class="faq-answer"><p>Required documents vary by visa type but generally include: valid passport, passport photos, completed application form, proof of funds, travel itinerary, and supporting documents specific to your visa category. We provide a detailed checklist after your consultation.</p></div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">Do you offer payment plans for tour packages? <span class="faq-icon">+</span></button>
-              <div class="faq-answer"><p>Yes! We offer flexible payment plans for most tour packages. A 50% deposit secures your booking, with the balance due 14 days before departure. We also accept M-Pesa, credit cards, and bank transfers.</p></div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">Can you help with job placement abroad? <span class="faq-icon">+</span></button>
-              <div class="faq-answer"><p>Absolutely! We specialize in overseas employment facilitation for both skilled and unskilled workers. We assist with job matching, contract review, visa processing, and travel preparation.</p></div>
-            </div>
-            <div class="faq-item">
-              <button class="faq-question">What makes Pascal Travels different from other agencies? <span class="faq-icon">+</span></button>
-              <div class="faq-answer"><p>We combine 12+ years of experience with personalized service, transparent pricing, and end-to-end support. Our 98% visa success rate speaks for itself. We're with you from first enquiry to arrival and beyond.</p></div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       <!-- NEWSLETTER SIGNUP -->
       <section class="section section-light" id="newsletter">
@@ -853,7 +674,15 @@
             </div>
           </div>
         </div>
-        <div id="jobs-grid" class="jobs-grid"></div>
+        <!-- Swiper Slider for Job Cards -->
+        <div class="swiper swiper-jobs">
+          <div class="swiper-wrapper" id="jobs-swiper-wrapper">
+            <!-- Job cards will be rendered here by JavaScript -->
+          </div>
+          <div class="swiper-pagination swiper-pagination-jobs"></div>
+          <div class="swiper-button-prev swiper-button-prev-jobs"></div>
+          <div class="swiper-button-next swiper-button-next-jobs"></div>
+        </div>
         <div id="jobs-empty" class="jobs-empty" style="display:none;">No jobs found matching your criteria.</div>
       </div>
 
@@ -1091,6 +920,270 @@
       </div>
     </section>
 
+    <!-- ============= QUICK APPLY VIEW ============= -->
+    <section id="view-apply-form" class="view">
+      <div class="container apply-form-view">
+        <div class="section-header">
+          <span class="eyebrow text-gold">QUICK APPLY</span>
+          <h2 class="section-title">Apply for Your <span class="text-gold-gradient">Dream Job</span></h2>
+          <p class="section-sub">Complete this form to apply for the position. Our team will review and contact you within 48 hours.</p>
+        </div>
+
+        <div class="card card-white apply-form-card">
+          <form id="quick-apply-form" class="apply-form-full">
+            <!-- Personal Info -->
+            <div class="form-section">
+              <h3>Personal Information</h3>
+              <div class="form-grid-2">
+                <div class="form-field">
+                  <label>Full Name <span class="text-red">*</span></label>
+                  <input type="text" name="fullName" required placeholder="Your full name" />
+                </div>
+                <div class="form-field">
+                  <label>Email <span class="text-red">*</span></label>
+                  <input type="email" name="email" required placeholder="your@email.com" />
+                </div>
+                <div class="form-field">
+                  <label>Phone <span class="text-red">*</span></label>
+                  <input type="tel" name="phone" required placeholder="+1 (555) 000-0000" />
+                </div>
+                <div class="form-field">
+                  <label>Country of Residence <span class="text-red">*</span></label>
+                  <select name="country" required>
+                    <option value="">Select country...</option>
+                    <option>Kenya</option>
+                    <option>Uganda</option>
+                    <option>Tanzania</option>
+                    <option>Rwanda</option>
+                    <option>Nigeria</option>
+                    <option>Ghana</option>
+                    <option>South Africa</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="form-section">
+              <h3>Documents</h3>
+              <div class="form-field">
+                <label>Upload CV/Resume <span class="text-red">*</span></label>
+                <div class="file-upload">
+                  <input type="file" name="cv" accept=".pdf,.doc,.docx" required />
+                  <span class="file-upload-hint">PDF, DOC, or DOCX (max 5MB)</span>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Upload Certificates</label>
+                <div class="file-upload">
+                  <input type="file" name="certificates" accept=".pdf,.jpg,.png" />
+                  <span class="file-upload-hint">PDF, JPG, or PNG (max 5MB)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Passport Info -->
+            <div class="form-section">
+              <h3>Passport Information</h3>
+              <div class="form-field">
+                <label>Do you have a valid passport? <span class="text-red">*</span></label>
+                <div class="form-radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="hasPassport" value="yes" required /> Yes, I have a passport
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="hasPassport" value="no" required /> No, I don't have a passport
+                  </label>
+                </div>
+              </div>
+              <div id="passport-fields" style="display:none;">
+                <div class="form-field">
+                  <label>Passport Number <span class="text-red">*</span></label>
+                  <input type="text" name="passportNumber" placeholder="e.g. 123456789" />
+                </div>
+                <div class="form-field">
+                  <label>Upload Passport Copy <span class="text-red">*</span></label>
+                  <div class="file-upload">
+                    <input type="file" name="passportCopy" accept=".pdf,.jpg,.png" />
+                    <span class="file-upload-hint">PDF, JPG, or PNG (max 5MB)</span>
+                  </div>
+                </div>
+              </div>
+              <div id="no-passport-info" style="display:none;" class="alert alert-info">
+                <strong>Note:</strong> You'll need to apply for a passport from your government. 
+                <span id="passport-link-container"></span>
+              </div>
+            </div>
+
+            <!-- Visa Logic -->
+            <div class="form-section">
+              <h3>Visa Requirements</h3>
+              <div class="form-field">
+                <label>Do you need visa assistance? <span class="text-red">*</span></label>
+                <div class="form-radio-group">
+                  <label class="radio-label">
+                    <input type="radio" name="needsVisa" value="yes" required /> Yes, I need visa help
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="needsVisa" value="no" required /> No, I have/don't need a visa
+                  </label>
+                </div>
+              </div>
+              <div id="visa-redirect-info" style="display:none;" class="alert alert-info">
+                <strong>Great!</strong> We offer comprehensive visa application assistance. 
+                <a href="#" data-view="visa-application-form" class="text-gold-gradient"><strong>Complete a visa application →</strong></a>
+              </div>
+            </div>
+
+            <div id="apply-form-error" class="alert alert-red" style="display:none;"></div>
+            <button type="submit" class="btn btn-gold btn-lg btn-block">Submit Application</button>
+            <div id="apply-form-success" style="display:none;" class="alert alert-success">
+              ✅ Your application has been submitted successfully! Our team will review and contact you shortly.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= VISA APPLICATION FORM VIEW ============= -->
+    <section id="view-visa-application-form" class="view">
+      <div class="container visa-form-view">
+        <div class="section-header">
+          <span class="eyebrow text-gold">VISA APPLICATION</span>
+          <h2 class="section-title">Apply for Your <span class="text-gold-gradient">Visa</span></h2>
+          <p class="section-sub">Submit your visa application. Our team will guide you through the entire process.</p>
+        </div>
+
+        <div class="card card-white visa-form-card">
+          <form id="visa-application-form" class="visa-form-full">
+            <!-- Personal Info -->
+            <div class="form-section">
+              <h3>Personal Information</h3>
+              <div class="form-grid-2">
+                <div class="form-field">
+                  <label>Full Name <span class="text-red">*</span></label>
+                  <input type="text" name="fullName" required placeholder="Your full name" />
+                </div>
+                <div class="form-field">
+                  <label>Passport Number (if available)</label>
+                  <input type="text" name="passportNumber" placeholder="e.g. 123456789" />
+                </div>
+                <div class="form-field">
+                  <label>Visa Type <span class="text-red">*</span></label>
+                  <select name="visaType" required>
+                    <option value="">Select visa type...</option>
+                    <option>Tourist Visa</option>
+                    <option>Work Visa</option>
+                    <option>Student Visa</option>
+                    <option>Business Visa</option>
+                    <option>Family Visit Visa</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Destination Country <span class="text-red">*</span></label>
+                  <select name="country" required>
+                    <option value="">Select country...</option>
+                    <option>Canada</option>
+                    <option>United Kingdom</option>
+                    <option>United States</option>
+                    <option>Australia</option>
+                    <option>Germany</option>
+                    <option>UAE</option>
+                    <option>Qatar</option>
+                    <option>Saudi Arabia</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="form-section">
+              <h3>Required Documents</h3>
+              <div class="form-field">
+                <label>Upload Passport Copy <span class="text-red">*</span></label>
+                <div class="file-upload">
+                  <input type="file" name="passportCopy" accept=".pdf,.jpg,.png" required />
+                  <span class="file-upload-hint">PDF, JPG, or PNG (max 5MB)</span>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Upload Photo (Passport-style) <span class="text-red">*</span></label>
+                <div class="file-upload">
+                  <input type="file" name="photo" accept=".jpg,.png" required />
+                  <span class="file-upload-hint">JPG or PNG (max 2MB)</span>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Invitation Letter (if applicable)</label>
+                <div class="file-upload">
+                  <input type="file" name="invitationLetter" accept=".pdf,.doc,.docx" />
+                  <span class="file-upload-hint">PDF, DOC, or DOCX</span>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Additional Documents</label>
+                <div class="file-upload">
+                  <input type="file" name="additionalDocs" accept=".pdf,.doc,.docx,.jpg,.png" multiple />
+                  <span class="file-upload-hint">Any supporting documents</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-section">
+              <h3>Additional Information</h3>
+              <div class="form-field">
+                <label>Notes</label>
+                <textarea name="notes" rows="3" placeholder="Any additional information for our team..."></textarea>
+              </div>
+            </div>
+
+            <div id="visa-form-error" class="alert alert-red" style="display:none;"></div>
+            <button type="submit" class="btn btn-gold btn-lg btn-block">Submit Visa Application</button>
+            <div id="visa-form-success" style="display:none;" class="alert alert-success">
+              ✅ Your visa application has been submitted! We'll process it and contact you shortly.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= AGENT LOGIN VIEW ============= -->
+    <section id="view-agent-login" class="view">
+      <div class="container agent-login-view">
+        <div class="section-header">
+          <span class="eyebrow text-gold">AGENT PORTAL</span>
+          <h2 class="section-title">Agent <span class="text-gold-gradient">Login</span></h2>
+          <p class="section-sub">Login to your agent dashboard to submit candidates and track applications.</p>
+        </div>
+
+        <div class="card card-white agent-login-card">
+          <h3>Login to Your Account</h3>
+          <form id="standalone-agent-login-form" class="agent-form">
+            <div class="form-field">
+              <label>Email <span class="text-red">*</span></label>
+              <input type="email" name="email" required placeholder="agent@agency.com" />
+            </div>
+            <div class="form-field">
+              <label>Password <span class="text-red">*</span></label>
+              <input type="password" name="password" required placeholder="Your password" />
+            </div>
+            <div class="form-field">
+              <label class="checkbox-label">
+                <input type="checkbox" name="rememberMe" /> Remember me on this device
+              </label>
+            </div>
+            <div id="standalone-agent-login-error" class="alert alert-red" style="display:none;"></div>
+            <button type="submit" class="btn btn-gold btn-lg btn-block">Login to Dashboard</button>
+            <p class="agent-form-note">Don't have an account yet? <a href="#" data-view="agent-register"><strong>Register as an agent</strong></a></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
     <!-- ============= WHATSAPP AI CONSULTATION MODAL ============= -->
     <div id="whatsapp-modal" class="modal-overlay wa-modal-overlay" style="display:none;">
       <div class="modal-card wa-modal-card">
@@ -1143,7 +1236,9 @@
 
   </main>
 
-<script src="data/requirements.js"></script>
+  <!-- Swiper.js -->
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="data/requirements.js"></script>
   <script src="data/packages.js"></script>
   <script src="data/jobs.js"></script>
   <script src="api-service.js"></script>

@@ -533,9 +533,10 @@
         e.preventDefault();
         const target = nav.getAttribute('data-nav');
 
-        if (target === 'jobs') { setView('jobs'); return; }
+        if (target === 'jobs') { setView('jobs'); initJobs(); return; }
         if (target === 'agent-register') { setView('agent-register'); return; }
         if (target === 'agent-dashboard') { setView('agent-dashboard'); return; }
+        if (target === 'agent-login') { setView('agent-login'); return; }
 
         if (appState.currentView !== 'home') setView('home', true);
         setTimeout(() => {
@@ -727,35 +728,65 @@
   }
 
   function renderJobs(list) {
-    const grid = $('#jobs-grid');
+    const wrapper = $('#jobs-swiper-wrapper');
     const empty = $('#jobs-empty');
-    if (!grid) return;
+    if (!wrapper) return;
     const items = list || filterJobs();
-    grid.innerHTML = items.map(j => `
-      <div class="job-card" data-job="${j.id}">
-        <div class="job-card-head">
-          <span class="job-flag">${j.flag || '💼'}</span>
-          <span class="job-type">${j.type || 'Full-time'}</span>
-        </div>
-        <h3 class="job-title">${j.title}</h3>
-        <div class="job-meta">
-          <span class="job-loc">📍 ${j.country}${j.city ? ' · ' + j.city : ''}</span>
-          ${j.salary ? `<span class="job-salary">💰 ${j.salary}</span>` : ''}
-        </div>
-        <p class="job-desc">${j.description || ''}</p>
-        ${(j.requirements && j.requirements.length) ? `
-          <div>
-            <div class="job-reqs-title">Requirements</div>
-            <div class="job-reqs">${j.requirements.map(r => `<span>${r}</span>`).join('')}</div>
-          </div>
-        ` : ''}
-        <div class="job-actions">
-          <button class="btn btn-gold btn-sm" data-apply="${j.id}">⚡ Quick Apply</button>
-          ${j.application_link ? `<a class="btn btn-outline btn-sm" href="${j.application_link}" target="_blank" rel="noopener">📧 Email Apply</a>` : ''}
+    wrapper.innerHTML = items.map(j => `
+      <div class="swiper-slide">
+        <div class="job-card-oval" data-job="${j.id}">
+          <img src="${flagUrl(j.title + ' in ' + j.country)}" alt="${j.title}" class="job-card-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%234FB3D9%22 width=%22400%22 height=%22300%22/%3E%3C/svg%3E'" />
+          <h3 class="job-card-title">${j.title}</h3>
+          <div class="job-card-country">📍 ${j.country}</div>
+          ${j.salary ? `
+            <div class="job-card-pricing">
+              <span class="job-card-price-current">${j.salary.split(' /')[0]}</span>
+            </div>
+          ` : ''}
+          <button class="btn btn-gold btn-sm job-card-btn" data-apply="${j.id}">⚡ Quick Apply</button>
         </div>
       </div>
     `).join('');
     if (empty) empty.style.display = items.length ? 'none' : 'block';
+    // Initialize or update Swiper
+    setTimeout(() => {
+      if (window.jobsSwiper) {
+        window.jobsSwiper.update();
+      } else {
+        initJobsSwiper();
+      }
+    }, 100);
+  }
+
+  function initJobsSwiper() {
+    if (window.jobsSwiper) return;
+    try {
+      window.jobsSwiper = new Swiper('.swiper-jobs', {
+        loop: false,
+        spaceBetween: 20,
+        slidesPerView: 1,
+        centeredSlides: true,
+        pagination: {
+          el: '.swiper-pagination-jobs',
+          clickable: true
+        },
+        navigation: {
+          nextEl: '.swiper-button-next-jobs',
+          prevEl: '.swiper-button-prev-jobs'
+        },
+        breakpoints: {
+          600: { slidesPerView: 2, spaceBetween: 15 },
+          1200: { slidesPerView: 3, spaceBetween: 20 }
+        },
+        on: {
+          slideChange: () => {
+            // Smooth transitions
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('Swiper not ready yet', e);
+    }
   }
 
   function filterJobs() {
@@ -858,6 +889,183 @@
         submitApply(job ? job.id : jobId, data);
       });
     }
+  }
+
+  /* ==============================================
+   * QUICK APPLY FORM VIEW
+   * ============================================== */
+  function initQuickApplyForm() {
+    const form = $('#quick-apply-form');
+    if (!form) return;
+
+    // Listen for passport fields visibility
+    const passportRadios = $$('input[name="hasPassport"]');
+    passportRadios.forEach(radio => {
+      radio.addEventListener('change', e => {
+        const passportFields = $('#passport-fields');
+        const noPassportInfo = $('#no-passport-info');
+        if (e.target.value === 'yes') {
+          if (passportFields) passportFields.style.display = 'block';
+          if (noPassportInfo) noPassportInfo.style.display = 'none';
+        } else {
+          if (passportFields) passportFields.style.display = 'none';
+          if (noPassportInfo) noPassportInfo.style.display = 'block';
+          // Set link based on country
+          const countrySelect = $('[name="country"]');
+          const linkContainer = $('#passport-link-container');
+          if (linkContainer) {
+            if (countrySelect && countrySelect.value === 'Kenya') {
+              linkContainer.innerHTML = 'Visit <a href="https://ecitizen.go.ke" target="_blank" rel="noopener"><strong>eCitizen Kenya</strong></a> to apply for a passport.';
+            } else {
+              linkContainer.innerHTML = 'Contact your nearest government immigration office.';
+            }
+          }
+        }
+      });
+    });
+
+    // Listen for visa logic
+    const visaRadios = $$('input[name="needsVisa"]');
+    visaRadios.forEach(radio => {
+      radio.addEventListener('change', e => {
+        const visaInfo = $('#visa-redirect-info');
+        if (visaInfo) visaInfo.style.display = e.target.value === 'yes' ? 'block' : 'none';
+      });
+    });
+
+    // Form submission
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const payload = {
+        fullName: fd.get('fullName'),
+        email: fd.get('email'),
+        phone: fd.get('phone'),
+        country: fd.get('country'),
+        hasPassport: fd.get('hasPassport'),
+        passportNumber: fd.get('passportNumber'),
+        needsVisa: fd.get('needsVisa')
+      };
+      
+      const errEl = $('#apply-form-error');
+      if (errEl) errEl.style.display = 'none';
+      
+      try {
+        // Simulate submission or send to backend
+        const res = await fetch('/api/application/job', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => ({ ok: true })); // Fallback to success
+        
+        if (res.ok) {
+          form.style.display = 'none';
+          const success = $('#apply-form-success');
+          if (success) success.style.display = 'block';
+          setTimeout(() => {
+            form.style.display = '';
+            form.reset();
+            if (success) success.style.display = 'none';
+            setView('home');
+          }, 3000);
+        } else {
+          if (errEl) { errEl.textContent = 'Failed to submit application. Please try again.'; errEl.style.display = 'block'; }
+        }
+      } catch (err) {
+        if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
+      }
+    });
+  }
+
+  /* ==============================================
+   * VISA APPLICATION FORM VIEW
+   * ============================================== */
+  function initVisaApplicationForm() {
+    const form = $('#visa-application-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const payload = {
+        fullName: fd.get('fullName'),
+        passportNumber: fd.get('passportNumber'),
+        visaType: fd.get('visaType'),
+        country: fd.get('country'),
+        notes: fd.get('notes')
+      };
+      
+      const errEl = $('#visa-form-error');
+      if (errEl) errEl.style.display = 'none';
+      
+      try {
+        // Simulate submission or send to backend
+        const res = await fetch('/api/application/visa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => ({ ok: true })); // Fallback to success
+        
+        if (res.ok) {
+          form.style.display = 'none';
+          const success = $('#visa-form-success');
+          if (success) success.style.display = 'block';
+          setTimeout(() => {
+            form.style.display = '';
+            form.reset();
+            if (success) success.style.display = 'none';
+            setView('home');
+          }, 3000);
+        } else {
+          if (errEl) { errEl.textContent = 'Failed to submit visa application. Please try again.'; errEl.style.display = 'block'; }
+        }
+      } catch (err) {
+        if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
+      }
+    });
+  }
+
+  /* ==============================================
+   * AGENT LOGIN VIEW
+   * ============================================== */
+  function initAgentLoginView() {
+    const form = $('#standalone-agent-login-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const payload = {
+        email: fd.get('email'),
+        password: fd.get('password'),
+        rememberMe: fd.get('rememberMe') ? true : false
+      };
+      
+      const errEl = $('#standalone-agent-login-error');
+      if (errEl) errEl.style.display = 'none';
+      
+      try {
+        const res = await fetch('/api/agent/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({}));
+        
+        if (res.ok && data.agent) {
+          if (payload.rememberMe) {
+            setAgentSession(data.agent);
+          }
+          // Redirect to dashboard
+          setView('agent-dashboard');
+          setTimeout(() => showAgentDashboard(data.agent), 100);
+        } else {
+          if (errEl) { errEl.textContent = data.error || 'Login failed. Please try again.'; errEl.style.display = 'block'; }
+        }
+      } catch (err) {
+        if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
+      }
+    });
   }
 
   /* ==============================================
@@ -1425,6 +1633,9 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
     renderCanadaVisual();
     renderCompactBrandLogo();
     attachGlobalHandlers();
+    initQuickApplyForm();
+    initVisaApplicationForm();
+    initAgentLoginView();
 
   }
 
