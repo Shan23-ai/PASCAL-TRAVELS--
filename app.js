@@ -25,8 +25,11 @@
     return `${sym}${Number(n || 0).toLocaleString('en-US')}`;
   }
   const currencyOf = p => (p && p.processingCurrency) ? p.processingCurrency : DEFAULT_CURRENCY;
-  const flagUrl = (prompt, size = 'square_hd') =>
-    `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=${size}`;
+  const flagUrl = (prompt, size = 'square_hd') => {
+    // Enhanced prompt for better image generation
+    const enhancedPrompt = `Professional high-quality travel and career image: ${prompt}. Vibrant colors, modern style, realistic, professional photography, 4K quality`;
+    return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(enhancedPrompt)}&image_size=${size}`;
+  };
 
   function flattenAllPackages() {
     return [
