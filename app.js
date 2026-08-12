@@ -4,6 +4,8 @@
   const PKG = window.PACKAGES_DATA;
   const REQ = window.REQUIREMENTS_DATA;
 
+  const APP_STATUS_KEY = 'pascal_applications';
+
   const appState = {
     currentView: 'home',
     previousView: 'home',
@@ -91,22 +93,30 @@
     const estText = meta.est;
     const priceShow = p.pricePerPerson ? money(p.pricePerPerson, cur) + ' / pp' : money(meta.processing + meta.ticket, cur);
     const fromLabel = p.pricePerPerson ? 'From' : 'Total from';
+    const imagePrompt = `${p.country || meta.title} breathtaking panoramic destination image, famous landmarks, modern city skyline, scenic nature, vibrant colors, professional travel photography, cinematic lighting, ultra realistic, 4K`;
+    const imageUrl = flagUrl(imagePrompt, 'landscape_4_3');
+
     return `
       <div class="visa-card" data-package="${p.id}">
-        <div class="visa-card-header">
-          <span class="visa-flag">${meta.flag}</span>
-          <span class="visa-est">⏱ ${estText}</span>
+        <div class="visa-card-visual">
+          <img src="${imageUrl}" alt="${meta.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 500%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 x2=%221%22 y1=%220%22 y2=%221%22%3E%3Cstop stop-color=%22%2387CEEB%22/%3E%3Cstop offset=%221%22 stop-color=%22%23E0F4FF%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill=%22url(%23g)%22 width=%22800%22 height=%22500%22/%3E%3C/svg%3E';this.style.objectFit='cover';" />
         </div>
-        <h3 class="visa-country">${meta.title}</h3>
-        <div class="visa-city">${meta.subtitle}</div>
-        <p class="visa-desc">${p.description || ''}</p>
-        ${tags.length ? `<div class="visa-tags">${tags.slice(0, 3).map(t => `<span>${t}</span>`).join('')}</div>` : ''}
-        <div class="visa-footer">
-          <div>
-            <div class="visa-price-from">${fromLabel}</div>
-            <div class="visa-price">${priceShow}</div>
+        <div class="visa-card-body">
+          <div class="visa-card-header">
+            <span class="visa-flag">${meta.flag}</span>
+            <span class="visa-est">⏱ ${estText}</span>
           </div>
-          <button class="btn btn-gold btn-sm" data-select="${p.id}">Details →</button>
+          <h3 class="visa-country">${meta.title}</h3>
+          <div class="visa-city">${meta.subtitle}</div>
+          <p class="visa-desc">${p.description || ''}</p>
+          ${tags.length ? `<div class="visa-tags">${tags.slice(0, 3).map(t => `<span>${t}</span>`).join('')}</div>` : ''}
+          <div class="visa-footer">
+            <div>
+              <div class="visa-price-from">${fromLabel}</div>
+              <div class="visa-price">${priceShow}</div>
+            </div>
+            <button class="btn btn-gold btn-sm" data-select="${p.id}">Details →</button>
+          </div>
         </div>
       </div>
     `;
@@ -500,12 +510,108 @@
     };
   }
 
+  function getSavedApplications() {
+    try {
+      return JSON.parse(localStorage.getItem(APP_STATUS_KEY) || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveApplicationRecord(record) {
+    const list = getSavedApplications();
+    const existing = list.findIndex(item => item.reference === record.reference || (item.email === record.email && item.package === record.package && item.createdAt === record.createdAt));
+    if (existing >= 0) {
+      list[existing] = record;
+    } else {
+      list.unshift(record);
+    }
+    localStorage.setItem(APP_STATUS_KEY, JSON.stringify(list));
+    return record;
+  }
+
+  function renderApplicationTracker() {
+    const host = $('#application-tracker-list');
+    const empty = $('#application-tracker-empty');
+    const records = getSavedApplications();
+    if (!host) return;
+
+    if (!records.length) {
+      host.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+
+    if (empty) empty.style.display = 'none';
+    host.innerHTML = records.slice(0, 8).map(r => `
+      <div class="track-item">
+        <div class="track-header">
+          <div>
+            <div class="track-ref">${r.reference}</div>
+            <div class="track-package">${r.package}</div>
+          </div>
+          <span class="status-pill ${r.status.toLowerCase().replace(/\s+/g, '-')}">${r.status}</span>
+        </div>
+        <div class="track-meta">
+          <span>Applicant: ${r.applicant}</span>
+          <span>Email: ${r.email}</span>
+        </div>
+        <div class="track-progress">
+          <div class="track-progress-bar" style="width: ${r.progress}%"></div>
+        </div>
+        <div class="track-progress-text">${r.progress}% complete</div>
+      </div>
+    `).join('');
+  }
+
+  function trackApplicationByReference(reference, email) {
+    const records = getSavedApplications();
+    const match = records.find(r => r.reference.toLowerCase() === String(reference || '').trim().toLowerCase() && r.email.toLowerCase() === String(email || '').trim().toLowerCase());
+    const panel = $('#application-track-result');
+    const summary = $('#application-track-summary');
+    if (!panel || !summary) return;
+
+    if (!match) {
+      summary.innerHTML = '<div class="alert alert-red">No application was found for that reference and email.</div>';
+      panel.style.display = 'block';
+      return;
+    }
+
+    summary.innerHTML = `
+      <div class="track-result-box">
+        <div class="track-result-head">
+          <span>Application reference</span>
+          <strong>${match.reference}</strong>
+        </div>
+        <div class="track-result-body">
+          <div><span>Package</span><strong>${match.package}</strong></div>
+          <div><span>Status</span><strong>${match.status}</strong></div>
+          <div><span>Progress</span><strong>${match.progress}%</strong></div>
+          <div><span>Last update</span><strong>${match.lastUpdated}</strong></div>
+        </div>
+      </div>
+    `;
+    panel.style.display = 'block';
+  }
+
   function submitPayment() {
     const p = appState.selectedPackage;
     const meta = getPackageMeta(p);
     const ref = 'APP-' + Math.floor(100000 + Math.random() * 900000);
     const total = appState.totalProcessing + (p.pricePerPerson ? 0 : appState.totalTicket);
     const currency = getPackageMeta(p).currency;
+    const record = {
+      reference: ref,
+      package: `${meta.flag} ${meta.title}`,
+      applicant: appState.personalInfo.fullName || '—',
+      email: appState.personalInfo.email || '—',
+      status: 'Submitted for review',
+      progress: 20,
+      lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      createdAt: Date.now()
+    };
+
+    saveApplicationRecord(record);
 
     $('#booking-ref').textContent = ref;
     $('#success-summary').innerHTML = `
@@ -537,6 +643,7 @@
         const target = nav.getAttribute('data-nav');
 
         if (target === 'jobs') { setView('jobs'); initJobs(); return; }
+        if (target === 'track') { setView('track'); renderApplicationTracker(); return; }
         if (target === 'agent-register') { setView('agent-register'); return; }
         if (target === 'agent-dashboard') { setView('agent-dashboard'); return; }
         if (target === 'agent-login') { setView('agent-login'); return; }
@@ -617,6 +724,16 @@
 
     const btnStartApp = $('#btn-start-app');
     if (btnStartApp) btnStartApp.addEventListener('click', startApplication);
+
+    const trackerForm = $('#track-application-form');
+    if (trackerForm) {
+      trackerForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const ref = $('#tracker-reference')?.value || '';
+        const email = $('#tracker-email')?.value || '';
+        trackApplicationByReference(ref, email);
+      });
+    }
 
     const step1Next = $('#step1-next');
     if (step1Next) step1Next.addEventListener('click', () => {

@@ -26,6 +26,7 @@
           <li><a href="#" data-nav="home">Home</a></li>
           <li><a href="#" data-nav="destinations">Travel Packages</a></li>
           <li><a href="#" data-nav="jobs" data-view="jobs">Jobs</a></li>
+          <li><a href="#" data-nav="track">Track Application</a></li>
           <li><a href="#" data-nav="visa-application" data-view="visa-application-form">Visa Application</a></li>
           <li class="nav-agent-dropdown">
             <a href="#">Agent</a>
@@ -38,6 +39,7 @@
         </ul>
         <div class="nav-cta-group">
           <button class="btn btn-outline-nav btn-sm" data-nav="jobs" data-view="jobs">Explore Jobs</button>
+          <button class="btn btn-outline-nav btn-sm" data-nav="track">Track Status</button>
           <button id="nav-cta" class="btn btn-gold btn-sm" data-nav="visa-application" data-view="visa-application-form">Visa Application</button>
         </div>
       </div>
@@ -651,6 +653,45 @@
             <button class="btn btn-gold btn-lg" data-nav="home">🏠 Back to Home</button>
             <button class="btn btn-outline btn-lg" onclick="window.print()">🖨️ Print Receipt</button>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= APPLICATION TRACKING VIEW ============= -->
+    <section id="view-track" class="view">
+      <div class="container track-page">
+        <div class="section-header">
+          <span class="eyebrow text-gold">TRACK APPLICATION</span>
+          <h2 class="section-title">Check Your <span class="text-gold-gradient">Visa Progress</span></h2>
+          <p class="section-sub">Enter your application reference and email to follow each milestone from submission to approval.</p>
+        </div>
+
+        <div class="track-layout">
+          <div class="card card-white track-form-card">
+            <h3>Track Your Status</h3>
+            <form id="track-application-form" class="track-form">
+              <div class="form-field">
+                <label>Application Reference <span class="text-red">*</span></label>
+                <input id="tracker-reference" type="text" name="reference" required placeholder="APP-123456" />
+              </div>
+              <div class="form-field">
+                <label>Email Used During Application <span class="text-red">*</span></label>
+                <input id="tracker-email" type="email" name="email" required placeholder="you@example.com" />
+              </div>
+              <button type="submit" class="btn btn-gold btn-block">Check Status</button>
+            </form>
+          </div>
+
+          <div class="card card-white track-summary-card">
+            <h3>Recent Applications</h3>
+            <div id="application-tracker-list" class="track-list"></div>
+            <div id="application-tracker-empty" class="jobs-empty">No applications yet. Submit your first visa application to track it here.</div>
+          </div>
+        </div>
+
+        <div id="application-track-result" class="card card-white track-result" style="display:none; margin-top: 1.5rem;">
+          <h3>Application Timeline</h3>
+          <div id="application-track-summary"></div>
         </div>
       </div>
     </section>
