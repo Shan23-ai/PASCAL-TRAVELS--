@@ -19,7 +19,7 @@ window.JOBS_DATA = [
       'Proficiency in JavaScript / Python / Java',
       'Work permit sponsorship available'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Software%20Engineer%20(Canada)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Software%20Engineer%20(Canada)',
     created_at: '2026-01-01'
   },
   {
@@ -37,7 +37,7 @@ window.JOBS_DATA = [
       'IELTS OET (minimum C+)',
       'Relocation assistance provided'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Registered%20Nurse%20(UK)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Registered%20Nurse%20(UK)',
     created_at: '2026-01-01'
   },
   {
@@ -55,7 +55,7 @@ window.JOBS_DATA = [
       'Physical fitness and safety awareness',
       'Employer sponsorship available'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Construction%20Worker%20(Australia)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Construction%20Worker%20(Australia)',
     created_at: '2026-01-01'
   },
   {
@@ -73,7 +73,7 @@ window.JOBS_DATA = [
       '2+ years teaching experience',
       'Tax-free salary + housing allowance'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Teacher%20(UAE)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Teacher%20(UAE)',
     created_at: '2026-01-01'
   },
   {
@@ -91,7 +91,7 @@ window.JOBS_DATA = [
       'English B2 / German advantageous',
       'EU Blue Card sponsorship available'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Mechanical%20Engineer%20(Germany)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Mechanical%20Engineer%20(Germany)',
     created_at: '2026-01-01'
   },
   {
@@ -109,7 +109,7 @@ window.JOBS_DATA = [
       'Accommodation & transport provided',
       'Valid passport (6+ months)'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Hospitality%20Staff%20(Qatar)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Hospitality%20Staff%20(Qatar)',
     created_at: '2026-01-01'
   },
   {
@@ -127,7 +127,7 @@ window.JOBS_DATA = [
       'Free accommodation & transport',
       'Valid passport (6+ months)'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20Healthcare%20Assistant%20(Saudi%20Arabia)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Healthcare%20Assistant%20(Saudi%20Arabia)',
     created_at: '2026-01-01'
   },
   {
@@ -145,7 +145,7 @@ window.JOBS_DATA = [
       'Windows / Linux knowledge',
       'Type D visa support provided'
     ],
-    application_link: 'mailto:Pascaltravelsdoc@gmail.com?subject=Application%20-%20IT%20Support%20(Canada)',
+    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20IT%20Support%20(Canada)',
     created_at: '2026-01-01'
   }
 ];

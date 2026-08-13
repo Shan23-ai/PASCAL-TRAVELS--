@@ -7,7 +7,7 @@
 
 const nodemailer = require('nodemailer');
 
-const EMAIL_USER = process.env.EMAIL_USER || 'Pascaltravelsdoc@gmail.com';
+const EMAIL_USER = process.env.EMAIL_USER || 'Pascaltravelsdocs@gmail.com';
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || '';
 const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
 const SMTP_PORT = process.env.SMTP_PORT || 587;
@@ -73,7 +73,7 @@ async function sendApplicationConfirmation(email, fullName, packageName) {
           
           <div style="background: white; padding: 1rem; border-left: 4px solid #FFD700; margin-top: 1.5rem;">
             <p><strong>Questions?</strong></p>
-            <p>Contact us at: <a href="mailto:Pascaltravelsdoc@gmail.com">Pascaltravelsdoc@gmail.com</a></p>
+            <p>Contact us at: <a href="mailto:Pascaltravelsdocs@gmail.com">Pascaltravelsdocs@gmail.com</a></p>
             <p>Phone: <a href="tel:+254">+254 ...</a></p>
           </div>
         </div>

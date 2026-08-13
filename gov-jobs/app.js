@@ -8,7 +8,7 @@
   const $ = (sel, ctx) => (ctx || document).querySelector(sel);
   const $$ = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
 
-  const COMPANY_EMAIL = 'Pascaltravelsdoc@gmail.com';
+  const COMPANY_EMAIL = 'Pascaltravelsdocs@gmail.com';
   const WHATSAPP_NUMBER = '971568242388';
 
   /* =====================================================
