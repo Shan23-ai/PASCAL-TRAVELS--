@@ -28,9 +28,26 @@
   }
   const currencyOf = p => (p && p.processingCurrency) ? p.processingCurrency : DEFAULT_CURRENCY;
   const flagUrl = (prompt, size = 'square_hd') => {
-    // Enhanced prompt for better image generation
-    const enhancedPrompt = `Professional high-quality travel and career image: ${prompt}. Vibrant colors, modern style, realistic, professional photography, 4K quality`;
-    return `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(enhancedPrompt)}&image_size=${size}`;
+    // Create a simple hash of the prompt for deterministic image selection
+    let hash = 0;
+    for (let i = 0; i < prompt.length; i++) {
+      const char = prompt.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    const imageId = Math.abs(hash) % 1000; // Map to 0-999 range
+    
+    // Determine dimensions based on size parameter
+    let width = 600;
+    let height = 600;
+    if (size === 'landscape_4_3') {
+      width = 1200;
+      height = 900;
+    }
+    
+    // Use Picsum.photos for reliable image generation
+    // Uses deterministic seed based on prompt hash for consistency
+    return `https://picsum.photos/seed/${imageId}-${prompt.substring(0, 20).replace(/\s+/g, '')}/` + width + '/' + height;
   };
 
   function flattenAllPackages() {
