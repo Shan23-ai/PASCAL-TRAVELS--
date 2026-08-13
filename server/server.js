@@ -58,6 +58,7 @@ app.use('/api/payments', require('./routes/payments'));
 /* ---- Jobs & Agents API routes ---- */
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/agents', require('./routes/agents'));
+app.use('/api/emails', require('./routes/emails'));
 
 /* ---- Static frontend (if files exist) ---- */
 // The frontend (index.html, app.js, style.css) lives in the parent of /server.

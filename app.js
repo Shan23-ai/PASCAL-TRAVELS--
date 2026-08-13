@@ -1189,9 +1189,11 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const fd = new FormData(form);
+      const email = fd.get('email');
+      const fullName = fd.get('fullName');
       const payload = {
-        fullName: fd.get('fullName'),
-        email: fd.get('email'),
+        fullName: fullName,
+        email: email,
         phone: fd.get('phone'),
         country: fd.get('country'),
         hasPassport: fd.get('hasPassport'),
@@ -1203,6 +1205,17 @@
       if (errEl) errEl.style.display = 'none';
       
       try {
+        // Send email notification
+        fetch('/api/emails/application-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            fullName: fullName,
+            packageName: 'Job Application'
+          })
+        }).catch(err => console.log('Email notification skipped:', err.message));
+
         // Simulate submission or send to backend
         const res = await fetch('/api/application/job', {
           method: 'POST',
@@ -1211,6 +1224,7 @@
         }).catch(() => ({ ok: true })); // Fallback to success
         
         if (res.ok) {
+          showToast('✅ Application submitted successfully!', 'success');
           form.style.display = 'none';
           const success = $('#apply-form-success');
           if (success) success.style.display = 'block';
@@ -1222,9 +1236,11 @@
           }, 3000);
         } else {
           if (errEl) { errEl.textContent = 'Failed to submit application. Please try again.'; errEl.style.display = 'block'; }
+          showToast('❌ Failed to submit application', 'error');
         }
       } catch (err) {
         if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
+        showToast('❌ Network error: ' + err.message, 'error');
       }
     });
   }
@@ -1239,10 +1255,14 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const fd = new FormData(form);
+      const email = fd.get('email');
+      const fullName = fd.get('fullName');
+      const visaType = fd.get('visaType');
       const payload = {
-        fullName: fd.get('fullName'),
+        fullName: fullName,
+        email: email,
         passportNumber: fd.get('passportNumber'),
-        visaType: fd.get('visaType'),
+        visaType: visaType,
         country: fd.get('country'),
         notes: fd.get('notes')
       };
@@ -1251,6 +1271,17 @@
       if (errEl) errEl.style.display = 'none';
       
       try {
+        // Send email notification
+        fetch('/api/emails/visa-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            fullName: fullName,
+            visaType: visaType || 'Work Visa'
+          })
+        }).catch(err => console.log('Email notification skipped:', err.message));
+
         // Simulate submission or send to backend
         const res = await fetch('/api/application/visa', {
           method: 'POST',
@@ -1259,6 +1290,7 @@
         }).catch(() => ({ ok: true })); // Fallback to success
         
         if (res.ok) {
+          showToast('✅ Visa application submitted successfully!', 'success');
           form.style.display = 'none';
           const success = $('#visa-form-success');
           if (success) success.style.display = 'block';
@@ -1270,9 +1302,11 @@
           }, 3000);
         } else {
           if (errEl) { errEl.textContent = 'Failed to submit visa application. Please try again.'; errEl.style.display = 'block'; }
+          showToast('❌ Failed to submit visa application', 'error');
         }
       } catch (err) {
         if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
+        showToast('❌ Network error: ' + err.message, 'error');
       }
     });
   }
