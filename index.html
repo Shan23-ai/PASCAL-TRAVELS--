@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="style.css" />
   <!-- Swiper.js CSS -->
   <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <!-- AOS - Animate on Scroll -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
 </head>
 <body>
   <main id="app-root" class="app-root">
@@ -221,125 +223,21 @@
         </div>
       </section>
 
-      <!-- CEO & PARTNERSHIP -->
-      <section class="section section-company" id="company" style="background: linear-gradient(135deg, #F5F5F5 0%, #F0F8FF 100%); position: relative; overflow: hidden;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 10% 50%, rgba(79, 179, 217, 0.08) 0%, transparent 50%), radial-gradient(circle at 90% 50%, rgba(255, 215, 0, 0.06) 0%, transparent 50%); pointer-events: none;"></div>
+      <!-- DUBAI & ABU DHABI AUGUST HOLIDAYS -->
+      <section id="dubai-section" class="section section-light" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFF5CC 100%); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.08) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(79, 179, 217, 0.06) 0%, transparent 50%); pointer-events: none;"></div>
         <div class="container" style="position: relative; z-index: 1;">
           <div class="section-header">
-            <span class="eyebrow text-gold-gradient">EXECUTIVE TEAM</span>
-            <h2 class="section-title">Meet the CEO <span class="text-accent-red">Leading Global Recruitment</span></h2>
-            <p class="section-sub">Trusted leadership driving transparent jobs placement, visa support, and partner success.</p>
+            <span class="eyebrow text-gold-gradient">AUGUST HOLIDAY SPECIALS</span>
+            <h2 class="section-title">Dubai & Abu Dhabi <span class="text-accent-red">August Holidays</span></h2>
+            <p class="section-sub">Experience Dubai and Abu Dhabi with unforgettable tours, luxury accommodation and exciting adventures.</p>
           </div>
-
-          <div class="ceo-grid">
-            <div class="ceo-card card card-white">
-              <img src="assets/ceo.jpg" alt="CEO portrait" class="ceo-photo" />
-              <div class="ceo-copy">
-                <span class="eyebrow text-gold">Founder & CEO</span>
-                <h3>Pascal Njoroge</h3>
-                <p>With 12+ years of experience in immigration, recruitment, and travel management, Pascal has placed thousands of professionals in top destinations across Canada, the UK, UAE, Australia, and Europe.</p>
-                <ul class="ceo-highlights">
-                  <li>✅ Global employer network</li>
-                  <li>✅ Compliance-first visa strategy</li>
-                  <li>✅ Candidate-focused onboarding</li>
-                  <li>✅ Transparent case tracking</li>
-                </ul>
-              </div>
-            </div>
-            <div class="partnership-card card card-white">
-              <h3>Partner With Our Recruitment Network</h3>
-              <p>Agencies and employer partners gain access to vetted candidate pipelines, fast processing, and performance-based collaboration.</p>
-              <div class="partnership-grid">
-                <div><strong>Recruitment</strong><span>Candidate sourcing & submission</span></div>
-                <div><strong>Employer relations</strong><span>Job matching & compliance review</span></div>
-                <div><strong>Agent support</strong><span>Dashboard, reporting, and commission tracking</span></div>
-                <div><strong>Global reach</strong><span>Canada, UK, UAE, Australia, Europe</span></div>
-              </div>
-              <button class="btn btn-red btn-lg" data-nav="agent-register" data-view="view-agent-register">Become an Agent</button>
-            </div>
-          </div>
-
-          <!-- ABOUT US -->
-          <div class="card card-white about-card">
-            <h3 class="about-title"><span class="about-badge">📌</span> ABOUT US</h3>
-            <div class="about-text">
-              <p><strong>Pascal Tours and Travels</strong> is a leading consultancy dedicated to <em>transforming dreams into reality</em>.</p>
-              <p>Founded by <strong>Mr Pascal</strong>, we provide exceptional travel and international opportunities for individuals, families, and professionals seeking to explore the world.</p>
-              <p><strong>Our Specializations:</strong></p>
-              <ul class="about-list">
-                <li>Overseas employment facilitation</li>
-                <li>Visa application assistance</li>
-                <li>Study abroad services</li>
-                <li>Comprehensive travel consultations</li>
-              </ul>
-              <p>Our unwavering commitment to excellence ensures that we deliver reliable, professional, and transparent services. With personalized support and expert guidance, we empower our clients to confidently navigate the intricacies of international travel, education, and employment.</p>
-            </div>
-          </div>
-
-          <!-- MISSION · VISION · SERVICES  -->
-          <div class="grid grid-3 mv-grid">
-            <div class="card card-sky mv-card">
-              <div class="mv-icon">👁️</div>
-              <h4>VISION</h4>
-              <p>To be the world's most trusted and beloved travel agency, inspiring unforgettable journeys and creating lifelong memories for our clients.</p>
-            </div>
-            <div class="card card-gold mv-card">
-              <div class="mv-icon">🎯</div>
-              <h4>MISSION</h4>
-              <p>At Pascal Travels and Tours, our mission is to provide exceptional travel experiences that exceed our clients expectations. We connect individuals with global opportunities by delivering professional travel, visa, and overseas employment support services marked by integrity, excellence, and unwavering reliability.</p>
-            </div>
-            <div class="card card-white mv-card">
-              <div class="mv-icon">🤝</div>
-              <h4>OUR SERVICES</h4>
-              <ul class="mv-list">
-                <li>• Deliver <strong>personalized</strong> and expert travel planning</li>
-                <li>• Offer <strong>unique & immersive</strong> experiences</li>
-                <li>• Foster <strong>long-term relationships</strong> with our clients</li>
-                <li>• Continuous <strong>innovate & improve</strong> our services</li>
-                <li>• Promote <strong>sustainable & responsible</strong> tourism practices</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- 6 SERVICE TYPES MATRIX (from profile table) -->
-          <div class="section-header" style="margin-top:3rem;">
-            <span class="eyebrow text-white-op">SIX SPECIALIZED LINES</span>
-            <h3 class="section-title text-white">Service Delivery <span class="text-gold-gradient">Matrix.</span></h3>
-          </div>
-          <div class="grid grid-3 services-matrix">
-            <div class="svc-m-card">
-              <div class="svc-m-icon" style="background:linear-gradient(135deg,#FFD700,#E8A400);">💼</div>
-              <h5>Overseas Employment Facilitation</h5>
-              <p>Expert assistance in securing <strong>skilled & unskilled jobs abroad</strong> — from application to travel preparation.</p>
-            </div>
-            <div class="svc-m-card">
-              <div class="svc-m-icon" style="background:linear-gradient(135deg,#4FB3D9,#1E88E5);">🛂</div>
-              <h5>Visa Application Assistance</h5>
-              <p>Unmatched support in preparing and processing <strong>visa applications</strong> with clear requirements at every step.</p>
-            </div>
-            <div class="svc-m-card">
-              <div class="svc-m-icon" style="background:linear-gradient(135deg,#E53E3E,#C53030);">🎓</div>
-              <h5>Study Abroad Services</h5>
-              <p>Guidance on admissions, study visas, and seamless travel preparation for students heading overseas.</p>
-            </div>
-            <div class="svc-m-card">
-              <div class="svc-m-icon" style="background:linear-gradient(135deg,#1E3A5F,#0B2E69);">🇪🇺</div>
-              <h5>Schengen Visa Assistance</h5>
-              <p>Specialized help with accurate, complete, and <strong>compliant Schengen visa applications</strong> covering 27 nations.</p>
-            </div>
-            <div class="svc-m-card">
-              <div class="svc-m-icon" style="background:linear-gradient(135deg,#43A047,#2E7D32);">✈️</div>
-              <h5>Travel Consultancy</h5>
-              <p>Expert advice on travel requirements, destination procedures, and meticulous travel planning for every itinerary.</p>
-            </div>
-            <div class="svc-m-card">
-              <div class="svc-m-icon" style="background:linear-gradient(135deg,#8E44AD,#6A1B9A);">📁</div>
-              <h5>Documentation Support</h5>
-              <p>Organizing & preparing essential documents for visas, employment contracts, and study program enrollments.</p>
-            </div>
-          </div>
+          <div id="dubai-packages-grid" class="grid grid-2"></div>
         </div>
       </section>
+
+      <!-- CEO & PARTNERSHIP -->
+
 
       <!-- BUYER-FIRST OFFER (moved below SIX SPECIALIZED LINES) -->
       <section class="section section-light" id="start-application">
@@ -453,18 +351,23 @@
                 <li>📞 +254 753 731 136</li>
                 <li>💬 +254 705 205 903 (WhatsApp)</li>
                 <li>📧 Pascaltravelsdoc@gmail.com</li>
-                <li>🌐 www.pascaltravels.co.ke</li>
-                <li>📍 Magomano B.S Complex, Along Tom Mboya Street,<br/>Opp. KTDA Plaza, Nairobi, Kenya.</li>
-                <li>🕘 Mon–Sat · 8:30 – 18:00</li>
               </ul>
-              <form id="contact-form" class="contact-form">
-                <input type="text" placeholder="Your name" required />
-                <input type="email" placeholder="Your email" required />
-                <textarea placeholder="How can we help?" rows="2" required></textarea>
-                <button type="submit" class="btn btn-gold btn-sm">Send Message</button>
-              </form>
             </div>
           </div>
+
+          <!-- CEO SECTION (Bottom) -->
+          <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(0,0,0,0.1); text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+              <img src="assets/ceo.jpg" alt="Mr Pascal - Founder & CEO" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+              <div style="text-align: left;">
+                <p style="margin: 0; font-weight: 600; font-size: 0.95rem;">Mr Pascal</p>
+                <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; opacity: 0.8;">Founder & CEO</p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; opacity: 0.75; max-width: 300px;">12+ years driving global recruitment, visa solutions, and travel experiences.</p>
+                <button class="btn btn-red btn-sm" style="margin-top: 0.75rem;" data-nav="agent-register" data-view="view-agent-register">Become an Agent</button>
+              </div>
+            </div>
+          </div>
+
           <div class="footer-bottom">
             <span>© 2026 Pascal Travels & Tour. All rights reserved. Developed by Shan.</span>
             <span class="text-accent-red">Licensed · Bonded · Insured ✦ Explore with Confidence</span>
@@ -1282,11 +1185,22 @@
 
   <!-- Swiper.js -->
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <!-- AOS - Animate on Scroll -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="data/requirements.js"></script>
   <script src="data/packages.js"></script>
   <script src="data/jobs.js"></script>
   <script src="api-service.js"></script>
   <script src="utils.js"></script>
   <script src="app.js"></script>
+  <script>
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: false,
+      offset: 100
+    });
+  </script>
 </body>
 </html>
