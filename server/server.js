@@ -51,6 +51,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+/* ---- Authentication routes ---- */
+app.use('/api/auth', require('./routes/auth'));
+
 /* ---- Payment API routes ---- */
 app.use('/api/webhooks', require('./routes/webhooks'));
 app.use('/api/payments', require('./routes/payments'));
