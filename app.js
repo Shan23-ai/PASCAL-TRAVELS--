@@ -984,21 +984,27 @@
     const empty = $('#jobs-empty');
     if (!wrapper) return;
     const items = list || filterJobs();
-    wrapper.innerHTML = items.map(j => `
+    wrapper.innerHTML = items.map(j => {
+      // Calculate original price (15% higher than current)
+      const originalPrice = j.salary ? 
+        (parseInt(j.salary.replace(/[^0-9]/g, '')) * 1.15).toLocaleString('en-US') : null;
+      const currentPrice = j.salary ? j.salary.split(' /')[0] : 'Contact';
+      
+      return `
       <div class="swiper-slide">
         <div class="job-card-oval" data-job="${j.id}">
           <img src="${flagUrl(j.title + ' in ' + j.country)}" alt="${j.title}" class="job-card-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%234FB3D9%22 width=%22400%22 height=%22300%22/%3E%3C/svg%3E'" />
           <h3 class="job-card-title">${j.title}</h3>
           <div class="job-card-country">📍 ${j.country}</div>
-          ${j.salary ? `
-            <div class="job-card-pricing">
-              <span class="job-card-price-current">${j.salary.split(' /')[0]}</span>
-            </div>
-          ` : ''}
+          <div class="job-card-pricing">
+            ${originalPrice ? `<span class="job-card-price-original">$${originalPrice}</span>` : ''}
+            <span class="job-card-price-current">${currentPrice}</span>
+          </div>
           <button class="btn btn-gold btn-sm job-card-btn" data-apply="${j.id}">⚡ Quick Apply</button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
     if (empty) empty.style.display = items.length ? 'none' : 'block';
     // Initialize or update Swiper
     setTimeout(() => {
