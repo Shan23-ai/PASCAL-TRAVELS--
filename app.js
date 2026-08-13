@@ -28,26 +28,50 @@
   }
   const currencyOf = p => (p && p.processingCurrency) ? p.processingCurrency : DEFAULT_CURRENCY;
   const flagUrl = (prompt, size = 'square_hd') => {
-    // Create a simple hash of the prompt for deterministic image selection
+    // Map content keywords to themed image categories for context-appropriate visuals
+    const categoryMap = {
+      safari: { keywords: ['safari', 'wildlife', 'lions', 'zebras', 'elephants', 'masai'], seeds: [100, 101, 102, 103, 104, 105] },
+      gorilla: { keywords: ['gorilla', 'trekking', 'bwindi', 'forest', 'mountains'], seeds: [110, 111, 112, 113, 114] },
+      serengeti: { keywords: ['serengeti', 'migration', 'plains', 'wildebeest'], seeds: [115, 116, 117, 118] },
+      zanzibar: { keywords: ['zanzibar', 'beach', 'sand', 'island', 'ocean', 'tropical'], seeds: [120, 121, 122, 123] },
+      mombasa: { keywords: ['mombasa', 'coast', 'diani', 'reef'], seeds: [125, 126, 127] },
+      dubai: { keywords: ['dubai', 'burj', 'khalifa', 'uae', 'emirates', 'luxury'], seeds: [200, 201, 202, 203, 204] },
+      marina: { keywords: ['marina', 'yacht', 'boat'], seeds: [205, 206, 207] },
+      desert: { keywords: ['desert', 'dune', 'sand'], seeds: [210, 211, 212] },
+      canada: { keywords: ['canada', 'toronto', 'vancouver', 'maple'], seeds: [300, 301, 302] },
+      mountain: { keywords: ['mountain', 'peak', 'snow'], seeds: [303, 304, 305] },
+      job: { keywords: ['job', 'office', 'work', 'professional', 'career', 'tech'], seeds: [400, 401, 402, 403] },
+      nurse: { keywords: ['nurse', 'healthcare', 'medical'], seeds: [410, 411, 412] }
+    };
+
+    // Determine category and select seed based on prompt content
+    let selectedSeeds = categoryMap.safari.seeds; // default to safari
+    
+    for (const [category, { keywords, seeds }] of Object.entries(categoryMap)) {
+      if (keywords.some(kw => prompt.toLowerCase().includes(kw))) {
+        selectedSeeds = seeds;
+        break;
+      }
+    }
+
+    // Create deterministic but varied seed selection based on prompt
     let hash = 0;
     for (let i = 0; i < prompt.length; i++) {
-      const char = prompt.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
+      hash = ((hash << 5) - hash) + prompt.charCodeAt(i);
     }
-    const imageId = Math.abs(hash) % 1000; // Map to 0-999 range
-    
-    // Determine dimensions based on size parameter
+    const seed = selectedSeeds[Math.abs(hash) % selectedSeeds.length];
+
+    // Determine dimensions
     let width = 600;
     let height = 600;
     if (size === 'landscape_4_3') {
       width = 1200;
       height = 900;
     }
-    
-    // Use Picsum.photos for reliable image generation
-    // Uses deterministic seed based on prompt hash for consistency
-    return `https://picsum.photos/seed/${imageId}-${prompt.substring(0, 20).replace(/\s+/g, '')}/` + width + '/' + height;
+
+    // Use picsum.photos with semantic seeds for theme-appropriate images
+    // Seed numbers: 100-119 (safari/wildlife), 200-212 (dubai/urban), 300-305 (canada/nature), 400-412 (jobs/professional)
+    return `https://picsum.photos/seed/${seed}-${prompt.substring(0, 15).replace(/[^a-z0-9]/gi, '')}/${width}/${height}`;
   };
 
   function flattenAllPackages() {
