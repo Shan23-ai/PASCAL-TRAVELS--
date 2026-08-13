@@ -2965,3 +2965,68 @@ button { font-family: inherit; cursor: pointer; border: none; }
     margin: 1rem auto;
   }
 }
+
+/* ===== REFERRAL & TOAST STYLES ===== */
+.referral-banner {
+  animation: slideIn 0.4s var(--ease) forwards;
+}
+
+.toast {
+  animation: slideIn 0.3s var(--ease) forwards;
+}
+
+.toast-success {
+  background: #10B981;
+}
+
+.toast-error {
+  background: #EF4444;
+}
+
+.toast-info {
+  background: #3B82F6;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* AOS Animation Overrides */
+[data-aos="fade-up"] {
+  opacity: 0;
+}
+
+[data-aos].aos-animate {
+  animation: fadeIn 0.8s var(--ease) forwards;
+}
+
+.aos-delay-0 { animation-delay: 0ms; }
+.aos-delay-1 { animation-delay: 100ms; }
+.aos-delay-2 { animation-delay: 200ms; }
+.aos-delay-3 { animation-delay: 300ms; }
+.aos-delay-4 { animation-delay: 400ms; }
+.aos-delay-5 { animation-delay: 500ms; }
+
+/* Dubai Package Cards */
+.dubai-package-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.3s var(--ease);
+}
+
+.dubai-package-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(79,179,217,0.2);
+}
+
+.package-img {
+  background: linear-gradient(135deg, var(--skyblue-pale), var(--golden-pale));
+}

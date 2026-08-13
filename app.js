@@ -59,6 +59,102 @@
     return { processing, ticket, flag, title, subtitle, est, currency };
   }
 
+  // ============= REFERRAL SYSTEM =============
+  const REFERRAL_KEY = 'pascal_referral_code';
+  const REFERRALS_DB_KEY = 'pascal_referrals';
+
+  function generateReferralCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = 'PASCAL-';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  function createReferralLink(referrerName) {
+    const code = generateReferralCode();
+    const referralData = {
+      code: code,
+      referrerName: referrerName,
+      createdAt: new Date().toISOString(),
+      clicks: 0,
+      conversions: 0,
+      reward: 'Discounted service fees',
+      status: 'active'
+    };
+    
+    // Save to localStorage (in production, this would be a database)
+    const referrals = JSON.parse(localStorage.getItem(REFERRALS_DB_KEY) || '[]');
+    referrals.push(referralData);
+    localStorage.setItem(REFERRALS_DB_KEY, JSON.stringify(referrals));
+    
+    return {
+      code: code,
+      shareLink: `${window.location.origin}/?ref=${code}`,
+      headline: `Exciting job openings in Canada – Apply Now! 🎯`
+    };
+  }
+
+  function getReferralCode() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('ref');
+  }
+
+  function processReferral(email, referralCode) {
+    if (!referralCode) return;
+    const referrals = JSON.parse(localStorage.getItem(REFERRALS_DB_KEY) || '[]');
+    const referral = referrals.find(r => r.code === referralCode);
+    if (referral) {
+      referral.conversions++;
+      referral.conversions_emails = referral.conversions_emails || [];
+      referral.conversions_emails.push(email);
+      localStorage.setItem(REFERRALS_DB_KEY, JSON.stringify(referrals));
+      return referral;
+    }
+    return null;
+  }
+
+  function showReferralBanner() {
+    const code = getReferralCode();
+    if (!code) return;
+    const referrals = JSON.parse(localStorage.getItem(REFERRALS_DB_KEY) || '[]');
+    const referral = referrals.find(r => r.code === code);
+    if (referral) {
+      const banner = document.createElement('div');
+      banner.className = 'referral-banner';
+      banner.style.cssText = `
+        position: fixed; top: 60px; left: 0; right: 0; 
+        background: linear-gradient(135deg, var(--golden), var(--accent-red)); 
+        color: white; padding: 1rem; text-align: center; z-index: 999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      `;
+      banner.innerHTML = `
+        <strong>👋 Welcome!</strong> You were referred by <strong>${referral.referrerName}</strong>. 
+        Enjoy exclusive benefits when you sign up today!
+      `;
+      document.body.insertBefore(banner, document.body.firstChild);
+      setTimeout(() => banner.style.display = 'none', 8000);
+    }
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.cssText = `
+      position: fixed; bottom: 20px; right: 20px; 
+      background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6'};
+      color: white; padding: 1rem 1.5rem; border-radius: 8px; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
+      animation: slideIn 0.3s ease-out;
+    `;
+    toast.innerHTML = `<div style="font-weight: 500;">${message}</div>`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
+
+  // ============= END REFERRAL SYSTEM =============
+
   function setView(name, scrollTop = true) {
     appState.previousView = appState.currentView;
     appState.currentView = name;
@@ -1793,6 +1889,7 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
     initQuickApplyForm();
     initVisaApplicationForm();
     initAgentLoginView();
+    showReferralBanner();
   }
 
   document.addEventListener('DOMContentLoaded', init);
