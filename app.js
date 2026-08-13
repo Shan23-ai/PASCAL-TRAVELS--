@@ -1321,35 +1321,46 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const fd = new FormData(form);
-      const payload = {
-        email: fd.get('email'),
-        password: fd.get('password'),
-        rememberMe: fd.get('rememberMe') ? true : false
-      };
+      const email = fd.get('email');
+      const password = fd.get('password');
+      const rememberMe = fd.get('rememberMe') ? true : false;
       
       const errEl = $('#standalone-agent-login-error');
       if (errEl) errEl.style.display = 'none';
       
       try {
-        const res = await fetch('/api/agent/login', {
+        // Use new /api/auth/login endpoint
+        const res = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ email, password })
         });
         const data = await res.json().catch(() => ({}));
         
-        if (res.ok && data.agent) {
-          if (payload.rememberMe) {
-            setAgentSession(data.agent);
+        if (res.ok && data.user) {
+          showToast('✅ Login successful!', 'success');
+          
+          // Store auth token
+          localStorage.setItem('auth_token', data.token);
+          
+          if (rememberMe) {
+            setAgentSession(data.user);
           }
+          
           // Redirect to dashboard
-          setView('agent-dashboard');
-          setTimeout(() => showAgentDashboard(data.agent), 100);
+          setTimeout(() => {
+            setView('agent-dashboard');
+            setTimeout(() => showAgentDashboard(data.user), 100);
+          }, 500);
         } else {
-          if (errEl) { errEl.textContent = data.error || 'Login failed. Please try again.'; errEl.style.display = 'block'; }
+          const errorMsg = data.message || 'Login failed. Please check your email and password.';
+          if (errEl) { errEl.textContent = errorMsg; errEl.style.display = 'block'; }
+          showToast('❌ ' + errorMsg, 'error');
         }
       } catch (err) {
-        if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
+        const errorMsg = 'Network error. Please check your connection.';
+        if (errEl) { errEl.textContent = errorMsg; errEl.style.display = 'block'; }
+        showToast('❌ ' + errorMsg, 'error');
       }
     });
   }
@@ -1378,35 +1389,58 @@
     const fd = new FormData(form);
     const specializations = $$('#specialization-checkboxes input[name="specializations"]:checked')
       .map(cb => cb.value);
+    
+    const email = fd.get('contactPersonEmail');
+    const password = fd.get('password');
+    const fullName = fd.get('contactPersonName');
+    const agentName = fd.get('agencyName');
+    
     const payload = {
-      agencyName: fd.get('agencyName'),
-      registrationNumber: fd.get('registrationNumber'),
-      contactPersonName: fd.get('contactPersonName'),
-      contactPersonEmail: fd.get('contactPersonEmail'),
-      phone: fd.get('phone'),
-      countryOperation: fd.get('countryOperation'),
-      specializations,
-      monthlyCandidates: fd.get('monthlyCandidates'),
-      password: fd.get('password')
+      email,
+      password,
+      fullName,
+      agentName,
+      agentCompany: agentName,
+      role: 'agent'
     };
+    
     const errEl = $('#agent-form-error');
     if (errEl) errEl.style.display = 'none';
+    
     try {
-      const res = await fetch(`${AGENT_API}/register`, {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await res.json().catch(() => ({}));
+      
       if (!res.ok) {
-        if (errEl) { errEl.textContent = data.error || 'Registration failed. Please try again.'; errEl.style.display = 'block'; }
+        const errorMsg = data.message || 'Registration failed. Please try again.';
+        if (errEl) { errEl.textContent = errorMsg; errEl.style.display = 'block'; }
+        showToast('❌ ' + errorMsg, 'error');
         return;
       }
+      
+      showToast('✅ Agent registration successful!', 'success');
+      
+      // Store auth token
+      localStorage.setItem('auth_token', data.token);
+      
+      // Store agent session
+      setAgentSession(data.user);
+      
       form.style.display = 'none';
       const success = $('#agent-register-success');
       if (success) success.style.display = 'block';
+      
+      setTimeout(() => {
+        setView('agent-dashboard');
+        showAgentDashboard(data.user);
+      }, 2000);
     } catch (e) {
       if (errEl) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
+      showToast('❌ Network error: ' + e.message, 'error');
     }
   }
 
