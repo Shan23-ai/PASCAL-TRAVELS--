@@ -165,6 +165,42 @@
     host.innerHTML = (PKG.eastAfricaTours || []).map(renderTourCard).join('');
   }
 
+  function renderDubaiPackages() {
+    const host = $('#dubai-packages-grid');
+    if (!host) return;
+    host.innerHTML = (PKG.dubaiHolidays || []).map(p => {
+      const img = p.packageImage ? flagUrl(p.packageImage, 'landscape_4_3') : '';
+      const basePrice = p.pricingOptions ? p.pricingOptions[0].price : p.pricePerPerson;
+      const higherPrice = Math.ceil(basePrice * 1.15); // Show 15% higher as "original" price
+      return `
+        <div class="card card-white dubai-package-card" data-aos="fade-up" data-aos-delay="0" data-package="${p.id}">
+          <div class="package-img" style="background: linear-gradient(135deg, var(--skyblue-pale), var(--golden-pale)); height: 200px; border-radius: 12px; overflow: hidden; margin: -1rem -1rem 1rem -1rem;">
+            ${img ? `<img src="${img}" alt="${p.destination}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,var(--skyblue),var(--golden))'">` : ''}
+          </div>
+          <h3 style="margin: 0.5rem 0; font-size: 1.1rem;">${p.flag} ${p.destination}</h3>
+          <div style="display: flex; gap: 0.5rem; margin: 0.5rem 0; font-size: 0.85rem; color: var(--text-muted);">
+            <span>${p.departureDate} — ${p.returnDate}</span>
+            <span>•</span>
+            <span>${p.duration}</span>
+          </div>
+          <p style="font-size: 0.9rem; margin: 0.5rem 0; color: var(--text-muted);">${p.description}</p>
+          <div style="margin: 0.75rem 0; padding: 0.75rem; background: rgba(79, 179, 217, 0.1); border-radius: 8px; font-size: 0.85rem;">
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">Highlights:</div>
+            ${(p.inclusions || []).slice(0, 3).map(i => `<div style="margin: 0.25rem 0;">✈️ ${i}</div>`).join('')}
+          </div>
+          <div style="margin: 0.75rem 0;">
+            <span style="font-size: 0.75rem; color: var(--text-muted); text-decoration: line-through; font-weight: 600;">$${higherPrice}</span>
+            <div style="font-size: 1.4rem; font-weight: 700; color: var(--accent-red);">$${basePrice}<span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"> / person</span></div>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-outline btn-sm" style="flex: 1;" data-select="${p.id}">View Package</button>
+            <button class="btn btn-gold btn-sm" style="flex: 1;" data-book="${p.id}">Book Now</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
   function renderCanadaVisual() {
     const img = $('#pr-flag');
     if (!img) return;
@@ -1750,13 +1786,13 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
     renderServices();
     renderVisaPackages('travel');
     renderTours();
+    renderDubaiPackages();
     renderCanadaVisual();
     renderCompactBrandLogo();
     attachGlobalHandlers();
     initQuickApplyForm();
     initVisaApplicationForm();
     initAgentLoginView();
-
   }
 
   document.addEventListener('DOMContentLoaded', init);
