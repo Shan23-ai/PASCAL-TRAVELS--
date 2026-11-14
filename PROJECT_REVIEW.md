@@ -81,7 +81,6 @@
 - ✅ data/packages.js - Travel/visa/study packages
 - ✅ data/jobs.js - Job listings (8 positions)
 - ✅ data/requirements.js - Visa requirements
-- ✅ gov-jobs/ - Government jobs portal
 
 ### Configuration
 - ✅ server/.env.local - Development environment
@@ -119,7 +118,6 @@
   - db/ - Database scripts
   - scripts/ - Initialization scripts
 - ✅ data/ - Application data
-- ✅ gov-jobs/ - Separate portal
 - ✅ assets/ - Images and resources
 
 ## ✅ GIT & VERSION CONTROL

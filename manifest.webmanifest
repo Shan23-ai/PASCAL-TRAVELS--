@@ -1,0 +1,11 @@
+{
+  "name": "Pascal Travels & Tour",
+  "short_name": "Pascal Travels",
+  "description": "East Africa safaris, beaches, and gorilla treks with local English-speaking guides.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#E0F4FF",
+  "theme_color": "#1E3A5F",
+  "icons": [{"src": "/assets/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}]
+}

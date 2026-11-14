@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Travel, work, study visa and permanent residency application support." />
+  <title>Visa Application | Pascal Travels</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="backgrounds.js" defer></script>
+</head>
+<body>
+  <nav id="navbar" class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand"><span class="brand-text">Pascal<span class="brand-accent">Travels</span><em>&amp; Tour</em></span></a>
+      <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul id="nav-links" class="nav-links">
+        <li><a href="index.html">Home</a></li><li><a href="tours.html">Travel Packages</a></li><li><a href="jobs.html">Jobs Abroad</a></li><li><a href="visa.html">Visa Application</a></li><li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="app-root">
+    <section class="section section-visa">
+      <div class="container">
+        <header class="section-header"><span class="eyebrow text-gold">VISA SERVICES</span><h1 class="section-title">Visa Application</h1><p class="section-sub">Travel, work, study and permanent residency applications.</p></header>
+        <div class="tabs" id="visa-tabs"><button class="tab tab-active" data-tab="travel">Travel Visas</button><button class="tab" data-tab="work">Work Visas</button><button class="tab" data-tab="study">Study Visas</button><button class="tab" data-tab="pr">Permanent Residency</button></div>
+        <div id="visa-packages" class="grid grid-3"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="section section-dark"><div class="container footer-bottom"><span><a href="#" data-whatsapp-link data-whatsapp-message="Hello Pascal Travels, I have a question about visa services.">WhatsApp Pascal Travels</a></span><span class="kws-association">In association with KWS <img src="images/kws-logo.jpg" alt="Kenya Wildlife Service logo" /></span><span>Developed by Remontada.co.</span></div></footer>
+  <script src="data/requirements.js"></script>
+  <script src="data/packages.js"></script>
+  <script src="data/jobs.js"></script>
+  <script src="utils.js"></script>
+  <script src="whatsapp.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

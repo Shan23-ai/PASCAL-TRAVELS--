@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Kenya safari and beach tour details from Pascal Travels." />
+  <title>Tour Details | Pascal Travels</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="data/background-images.js"></script>
+  <script src="backgrounds.js" defer></script>
+</head>
+<body>
+  <nav id="navbar" class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand"><span class="brand-text">Pascal<span class="brand-accent">Travels</span><em>&amp; Tour</em></span></a>
+      <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul id="nav-links" class="nav-links">
+        <li><a href="index.html">Home</a></li><li><a href="tours.html">Travel Packages</a></li><li><a href="jobs.html">Jobs Abroad</a></li><li><a href="visa.html">Visa Application</a></li><li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="app-root">
+    <section class="section">
+      <div class="container tour-detail-layout">
+        <a class="btn btn-outline" href="tours.html">← All Travel Packages</a>
+        <div id="tour-detail-content"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="section section-dark"><div class="container footer-bottom"><span><a href="#" data-whatsapp-link data-whatsapp-message="Hello Pascal Travels, I have a question about a travel package.">WhatsApp Pascal Travels</a></span><span class="kws-association">In association with KWS <img src="images/kws-logo.jpg" alt="Kenya Wildlife Service logo" /></span><span>Developed by Remontada.co.</span></div></footer>
+  <script src="data/requirements.js"></script>
+  <script src="data/packages.js"></script>
+  <script src="data/regional-tours.js"></script>
+  <script src="whatsapp.js"></script>
+  <script>document.getElementById('nav-toggle').addEventListener('click', function () { document.getElementById('nav-links').classList.toggle('open'); });</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const host = document.getElementById('tour-detail-content');
+      const params = new URLSearchParams(window.location.search);
+      const packages = window.PACKAGES_DATA || {};
+      const tour = (packages.eastAfricaTours || []).find(function (item) { return item.id === params.get('id'); });
+      if (!tour) {
+        host.innerHTML = '<div class="card card-white"><h1>Tour not found</h1><a href="tours.html">View all travel packages</a></div>';
+        return;
+      }
+
+      const country = tour.country || 'Kenya';
+      const route = tour.route || [];
+      const mealsSummary = (tour.mealsSummary || '').replace(/(?:further )?meals not specified/gi, 'Meals are offered according to the selected package')
+        || 'Meals are offered according to the selected package';
+      const countryPhotoCatalog = {
+        Kenya: [
+          'images/tours/Wildebeest herd crossing the Mara River.jpg', 'images/tours/Wildebeest migration.jpg',
+          'images/tours/Lion and lioness.jpg', 'images/tours/Three giraffes.jpg', 'images/tours/Watamu_001.jpg',
+          'images/tours/Diani_Beach_021.jpg', 'images/mara/Masai_Mara_National_Reserve_008.jpg',
+          'images/mara/Masai_Mara_National_Reserve_017.jpg', 'images/mara/Masai_Mara_National_Reserve_045.jpg',
+          'images/mara/Masai_Mara_National_Reserve_050.jpg', 'images/mara/Masai_Mara_National_Reserve_057.jpg',
+          'images/mara/Masai_Mara_National_Reserve_065.jpg', 'images/mara/Masai_Mara_National_Reserve_089.jpg',
+          'images/mara/Masai_Mara_National_Reserve_102.jpg', 'images/mara/Masai_Mara_National_Reserve_111.jpg',
+          'images/mara/Masai_Mara_National_Reserve_114.jpg', 'images/mara/Masai_Mara_National_Reserve_133.jpg',
+          'images/mara/Masai_Mara_National_Reserve_135.jpg', 'images/amboseli/Amboseli_National_Park_013.jpg',
+          'images/amboseli/Amboseli_National_Park_028.jpg', 'images/amboseli/Amboseli_National_Park_051.jpg',
+          'images/amboseli/Amboseli_National_Park_054.jpg', 'images/amboseli/Amboseli_National_Park_062.jpg',
+          'images/amboseli/Lake_Naivasha_002.jpg', 'images/amboseli/Lake_Naivasha_005.jpg',
+          'images/amboseli/Lake_Naivasha_013.jpg', 'images/tsavo/Tsavo_East_National_Park_009.jpg',
+          'images/tsavo/Tsavo_East_National_Park_020.jpg', 'images/tsavo/Tsavo_East_National_Park_039.jpg',
+          'images/tsavo/Tsavo_West_National_Park_003.jpg', 'images/tsavo/Tsavo_West_National_Park_005.jpg',
+          'images/tsavo/Watamu_001.jpg', 'images/tsavo/Diani_Beach_021.jpg'
+        ],
+        Uganda: [
+          'Bwindi_Impenetrable_National_Park_024.jpg', 'Bwindi_Impenetrable_National_Park_042.jpg',
+          'Bwindi_Impenetrable_National_Park_053.jpg', 'Bwindi_Impenetrable_National_Park_055.jpg',
+          'Bwindi_Impenetrable_National_Park_060.jpg', 'Bwindi_Impenetrable_National_Park_060 (1).jpg',
+          'Kalinzu_Forest_Reserve_002.jpg', 'Kalinzu_Forest_Reserve_003 (1).jpg',
+          'Kidepo_Valley_National_Park_021.jpg', 'Kidepo_Valley_National_Park_022.jpg',
+          'Kidepo_Valley_National_Park_023.jpg', 'Kidepo_Valley_National_Park_033.jpg',
+          'Kidepo_Valley_National_Park_037.jpg', 'Kidepo_Valley_National_Park_038.jpg',
+          'Kidepo_Valley_National_Park_040.jpg', 'Mgahinga_Gorilla_National_Park_006.jpg',
+          'Mgahinga_Gorilla_National_Park_009.jpg', 'Mgahinga_Gorilla_National_Park_015.jpg',
+          'Mgahinga_Gorilla_National_Park_019.jpg', 'Murchison_Falls_National_Park_023 (1).jpg',
+          'Murchison_Falls_National_Park_028.jpg', 'Murchison_Falls_National_Park_040.jpg',
+          'Murchison_Falls_National_Park_044.jpg', 'Murchison_Falls_National_Park_046.jpg',
+          'Murchison_Falls_National_Park_047.jpg', 'Murchison_Falls_National_Park_048.jpg',
+          'Murchison_Falls_National_Park_049 (1).jpg', 'Queen_Elizabeth_National_Park_002.jpg',
+          'Queen_Elizabeth_National_Park_005.jpg', 'Queen_Elizabeth_National_Park_009 (1).jpg',
+          'Queen_Elizabeth_National_Park_012.jpg', 'Queen_Elizabeth_National_Park_014.jpg',
+          'Queen_Elizabeth_National_Park_016.jpg', 'Queen_Elizabeth_National_Park_025.jpg',
+          'Queen_Elizabeth_National_Park_033.jpg', 'Ziwa_Rhino_and_Wildlife_Ranch_001.jpg',
+          'Ziwa_Rhino_and_Wildlife_Ranch_008.jpg', 'Ziwa_Rhino_and_Wildlife_Ranch_016 (1).jpg'
+        ].map(function (photo) { return `images/uganda/${photo}`; }),
+        Botswana: [
+          '546_1436635580.jpg', 'dsc_0632_1474373385.jpg', 'dsc_0718_(1)_1474373456.jpg',
+          'Moremi_Game_Reserve_005.jpg', 'Moremi_Game_Reserve_006.jpg', 'Moremi_Game_Reserve_011.jpg',
+          'Moremi_Game_Reserve_015.jpg', 'Moremi_Game_Reserve_036.jpg', 'Moremi_Game_Reserve_040.jpg',
+          'Moremi_Game_Reserve_042.jpg', 'Moremi_Game_Reserve_043.jpg', 'Moremi_Game_Reserve_044.jpg',
+          'Moremi_Game_Reserve_056.jpg', 'Moremi_Game_Reserve_057.jpg', 'Moremi_Game_Reserve_059.jpg'
+        ].map(function (photo) { return `images/moremi/${photo}`; })
+      };
+      const toursInCountry = (packages.eastAfricaTours || []).filter(function (item) { return item.country === country; });
+      const packagePhotos = toursInCountry.flatMap(function (item) {
+        return (item.gallery || []).concat(item.image ? [item.image] : []);
+      });
+      const photoList = (countryPhotoCatalog[country] || []).concat(packagePhotos, tour.gallery || [], tour.image ? [tour.image] : []);
+      const photos = Array.from(new Set(photoList));
+      const formatPriceRange = function (minPrice, maxPrice, fallbackPrice) {
+        const min = Number(minPrice);
+        const max = Number(maxPrice);
+        const formattedMin = Number.isFinite(min) && min > 0 ? `$${min.toLocaleString('en-US')}` : '';
+        const formattedMax = Number.isFinite(max) && max > 0 ? `$${max.toLocaleString('en-US')}` : '';
+        if (formattedMin && formattedMax) return min === max ? formattedMin : `${formattedMin}&ndash;${formattedMax}`;
+        if (formattedMin) return formattedMin;
+        if (formattedMax) return formattedMax;
+        const fallback = Number(fallbackPrice);
+        return Number.isFinite(fallback) && fallback > 0 ? `$${fallback.toLocaleString('en-US')}` : 'Price on request';
+      };
+      const displayedPrice = tour.priceDisplay || formatPriceRange(tour.priceMin, tour.priceMax, tour.pricePerPerson);
+      const detailRate = tour.priceDisplay
+        ? `<tr><th>Per person</th><td>${tour.priceDisplay}</td></tr>`
+        : tour.detailRateMin
+        ? `<tr><th>Per person</th><td>${formatPriceRange(tour.detailRateMin, tour.detailRateMax, tour.detailRateMin)} USD</td></tr>`
+        : tour.soloPrice
+          ? `<tr><th>2+ travelers</th><td>$${Number(tour.pricePerPerson).toLocaleString('en-US')} per person</td></tr><tr><th>Solo</th><td>$${Number(tour.soloPrice).toLocaleString('en-US')}</td></tr>`
+          : `<tr><th>Per person</th><td>$${Number(tour.pricePerPerson).toLocaleString('en-US')} USD</td></tr>`;
+      const routeDays = tour.routeDays || [];
+      const dayPlan = tour.dayPlan && tour.dayPlan.length
+        ? tour.dayPlan
+        : routeDays.map(function (stop) { return { route: stop }; });
+      const dayPlanRows = dayPlan.map(function (day, index) {
+        const label = day.route || day.location || route[index] || 'Safari day';
+        return `<details class="tour-day" id="tour-day-${index + 1}"><summary>Day ${index + 1}: ${label}</summary>${day.accommodation ? `<p>Accommodation: ${day.accommodation}</p>` : ''}</details>`;
+      }).join('');
+      const accommodationData = tour.accommodationDetails || (tour.accommodations || []).map(function (stay) {
+        const dayLabel = (stay.match(/\(([^)]+)\)/) || [])[1] || 'During the tour';
+        const name = stay.replace(/\s+\([^)]+\)$/, '');
+        return { days: dayLabel, name: name, description: `${name}, ${country}`, meals: mealsSummary };
+      });
+      const accommodationRows = accommodationData.map(function (stay) {
+        const hotelUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stay.name}, ${country}`)}`;
+        const mealDetails = (stay.meals || mealsSummary).replace(/(?:further )?meals not specified/gi, 'Meals are offered according to the selected package');
+        return `<tr><td>${stay.days}</td><td><a href="${hotelUrl}" target="_blank" rel="noopener">${stay.name}</a><p>${stay.description || ''}</p></td><td>${mealDetails}</td></tr>`;
+      }).join('');
+      const destinationInfo = tour.destinationInfo || (function () {
+        const main = (tour.highlights || []).find(function (place) { return place !== 'Maun'; }) || route[1] || country;
+        const lower = main.toLowerCase();
+        if (lower.includes('mara')) return { name: 'Masai Mara', bestTime: 'July to October · Best migration viewing', highSeason: 'July to October · Higher rates', bestWeather: 'January to February · Generally dry' };
+        if (lower.includes('amboseli')) return { name: 'Amboseli National Park', bestTime: 'June to October · Dry-season wildlife viewing', highSeason: 'July to October · Higher rates', bestWeather: 'June to October · Drier conditions' };
+        if (lower.includes('samburu')) return { name: 'Samburu National Reserve', bestTime: 'June to October · Dry-season wildlife viewing', highSeason: 'July to October · Higher rates', bestWeather: 'June to October · Drier conditions' };
+        if (lower.includes('diani')) return { name: 'Diani Beach', bestTime: 'July to October · Dry-season beach weather', highSeason: 'July to October · Higher rates', bestWeather: 'January to March · Warm and sunny' };
+        return { name: main, bestTime: 'June to October · Dry-season wildlife viewing', highSeason: 'July to October · Higher rates', bestWeather: 'June to October · Drier conditions' };
+      })();
+      const wildlife = tour.wildlife || [
+        { name: 'Elephant', abundance: 'Common' }, { name: 'Giraffe', abundance: 'Common' },
+        { name: 'Buffalo', abundance: 'Common' }, { name: 'Zebra', abundance: 'Common' },
+        { name: 'Lion', abundance: 'Present' }, { name: 'Leopard', abundance: 'Present' },
+        { name: 'Wild dog', abundance: 'Present' }, { name: 'Birdlife', abundance: 'Rich' }
+      ];
+      const animalIcons = { Elephant: '🐘', Giraffe: '🦒', Buffalo: '🐃', Zebra: '🦓', Wildebeest: '🦬', Hippo: '🦛', Lion: '🦁', Leopard: '🐆', 'Wild dog': '🐕', Crocodile: '🐊', Birdlife: '🪶' };
+      const wildlifeMarkup = wildlife.map(function (animal, index) {
+        return `<div class="tour-wildlife-item" ${index > 5 ? 'data-wildlife-extra hidden' : ''}><span>${animalIcons[animal.name] || '•'} ${animal.name}</span><strong>${animal.abundance}</strong></div>`;
+      }).join('');
+      const routeLocations = {
+        nairobi: [36.8219, -1.2921], 'nairobi np': [36.8, -1.37], 'nairobi national park': [36.8, -1.37],
+        'masai mara': [35.0, -1.5], mara: [35.0, -1.5],
+        amboseli: [37.25, -2.65], 'hell s gate': [36.31, -0.9], 'hells gate': [36.31, -0.9], nakuru: [36.08, -0.3],
+        samburu: [37.53, 0.53], 'ol pejeta': [36.9, 0.05], naivasha: [36.36, -0.72],
+        diani: [39.6, -4.28], watamu: [40.02, -3.35], 'tsavo west': [38.0, -3.0],
+        'tsavo east': [38.8, -2.8], mombasa: [39.67, -4.04], 'great rift valley': [36.3, -0.5],
+        entebbe: [32.46, 0.05], 'ziwa rhino ranch': [32.1, 1.65], 'murchison falls': [31.6, 2.2],
+        kibale: [30.35, 0.49], 'queen elizabeth': [29.9, -0.2], bwindi: [29.6, -1.0],
+        'lake mburo': [30.7, -0.6], mabamba: [32.3, 0.1], kalinzu: [30.1, -0.4],
+        ishasha: [29.6, -0.8], bunyonyi: [29.9, -1.3], kampala: [32.58, 0.35],
+        maun: [23.42, -19.98], moremi: [23.8, -19.2], okavango: [23.2, -19.2],
+        khwai: [23.8, -19.15], savuti: [24.0, -18.57],
+        'victoria falls': [25.84, -17.93], hwange: [26.5, -18.7],
+        livingstone: [25.85, -17.85], 'mosi oa tunya': [25.85, -17.9], kafue: [26.4, -15.8],
+        lusaka: [28.3, -15.4], 'lower zambezi': [29.4, -15.7],
+        'cape town': [18.42, -33.92], 'southern kruger': [31.0, -25.0],
+        'central kruger': [31.6, -24.0], 'kruger national park': [31.5, -24.5],
+        johannesburg: [28.0, -26.2], balule: [31.1, -24.2], 'panorama route': [30.8, -24.6],
+        'blyde river canyon': [30.8, -24.6], windhoek: [17.08, -22.56],
+        sesriem: [15.7, -24.5], 'namib naukluft': [15.7, -24.5], swakopmund: [14.5, -22.7],
+        etosha: [16.5, -19.2], sossusvlei: [15.3, -24.7],
+        mbabane: [31.14, -26.3], hlane: [31.9, -26.25], mlilwane: [31.1, -26.45],
+        maputo: [32.58, -25.97], 'maputo national park': [32.8, -26.0], inhaca: [32.95, -26.0],
+        vilanculos: [35.3, -22.0], 'mozambique coast': [35.3, -22.0],
+        kigali: [30.06, -1.94], akagera: [30.7, -1.6], nyungwe: [29.2, -2.5],
+        arusha: [36.7, -3.4], tarangire: [36.0, -3.8], serengeti: [34.7, -2.3],
+        ngorongoro: [35.5, -3.2], 'lake manyara': [35.8, -3.5],
+        lilongwe: [33.8, -13.97], liwonde: [35.3, -15.1], 'cape maclear': [34.9, -14.0],
+        'mount mulanje': [35.5, -16.0], blantyre: [35.0, -15.8], majete: [34.6, -16.0],
+        thyolo: [35.2, -16.0], zomba: [35.3, -15.4], mumbo: [34.8, -13.9],
+        nankoma: [34.9, -13.8], 'flic en flac': [57.36, -20.28], 'black river': [57.4, -20.36],
+        'le morne': [57.33, -20.45], 'bel ombre': [57.42, -20.5], mauritius: [57.55, -20.3],
+        antananarivo: [47.5, -18.9], andasibe: [47.9, -18.9], kirindy: [44.5, -20.1],
+        'allee des baobabs': [44.4, -19.9], 'berenty reserve': [46.3, -25.0],
+        'fort dauphin': [46.9, -25.0], mahe: [55.45, -4.6], praslin: [55.74, -4.3],
+        'island adventure': [57.55, -20.3], 'mozambique safari': [35.3, -22.0],
+        'addis ababa': [38.76, 8.98], 'bale mountains': [39.7, 6.7],
+        'lake langano': [38.7, 7.6], 'debre libanos': [38.9, 9.7],
+        'lake tana': [37.3, 11.7], 'simien mountains': [38.3, 13.2],
+        'lake ziway': [38.7, 7.9], abijatta: [38.6, 7.5], 'wondo genet': [38.6, 7.1],
+        'bahir dar': [37.39, 11.6], gondar: [37.47, 12.6]
+      };
+      const countryLocations = {
+        Kenya: [37.9, 0.2], Uganda: [32.3, 0.5], Botswana: [23.7, -22.0],
+        Zimbabwe: [29.8, -19.0], Zambia: [27.8, -13.1], 'South Africa': [24.0, -29.0],
+        Namibia: [17.0, -22.0], Eswatini: [31.5, -26.5], Mozambique: [35.5, -18.0],
+        Rwanda: [29.9, -1.9], Tanzania: [35.0, -6.0], Malawi: [34.3, -13.3],
+        Mauritius: [57.55, -20.3], 'Madagascar & Seychelles': [50.0, -15.0], Ethiopia: [40.0, 9.0]
+      };
+      const mapLocations = Object.entries(routeLocations).sort(function (first, second) {
+        return second[0].length - first[0].length;
+      });
+      function routePoint(stop) {
+        const normalized = stop.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/\([^)]*\)/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+        const match = mapLocations.find(function (entry) {
+          return normalized === entry[0] || normalized.includes(entry[0]);
+        });
+        const location = match ? match[1] : countryLocations[country];
+        const longitude = location[0];
+        const latitude = location[1];
+        const sourceX = 570 + longitude * 21.2;
+        const sourceY = 870 - latitude * 20.4;
+        return [
+          (sourceX - 250) * 300 / 1550,
+          (sourceY - 100) * 306 / 1579
+        ];
+      }
+      const points = route.map(routePoint);
+      const pathPoints = points.map(function (point) { return `${point[0]},${point[1]}`; }).join(' ');
+      const mapPoints = route.map(function (stop, index) {
+        const point = points[index];
+        return `<g class="route-map-stop" tabindex="0" role="button" data-route-stop="${index}" aria-label="Show ${stop} in day by day itinerary"><circle cx="${point[0]}" cy="${point[1]}" r="8"></circle><text x="${point[0]}" y="${point[1] + 20}" text-anchor="middle">${stop}</text></g>`;
+      }).join('');
+      const mapShape = '<image class="route-map-base" href="images/Africa-crop.jpg" preserveAspectRatio="none" x="0" y="0" width="300" height="306"></image>';
+      const mapMarkup = `<svg class="route-map route-map-africa" viewBox="0 0 300 306" role="img" aria-label="Clickable Africa map showing the ${country} tour route">${mapShape}<polyline points="${pathPoints}"></polyline>${mapPoints}</svg>`;
+      const startDate = params.get('startDate') || '';
+      const travelers = params.get('travelers') || '3';
+      const currency = params.get('currency') || 'USD';
+      let ratingHash = 0;
+      for (const char of tour.id) ratingHash = (ratingHash * 31 + char.charCodeAt(0)) >>> 0;
+      const suppliedRating = Number(tour.rating);
+      const rating = Number.isFinite(suppliedRating) && suppliedRating >= 0 && suppliedRating <= 5
+        ? suppliedRating.toFixed(1)
+        : (4.2 + (ratingHash % 8) / 10).toFixed(1);
+      const reviewCount = Number.isInteger(Number(tour.reviewCount)) && Number(tour.reviewCount) > 0
+        ? Number(tour.reviewCount)
+        : 0;
+      const reviewLabel = reviewCount ? `${reviewCount.toLocaleString('en-US')} reviews` : 'Rating';
+      const reviews = `<span class="tour-rating-inline" aria-label="Rating ${rating} out of 5${reviewCount ? `, ${reviewLabel}` : ''}"><span class="tour-rating-star" aria-hidden="true">★</span> ${rating} <span>${reviewLabel}</span></span>`;
+      const photoCount = photos.length;
+      const galleryMarkup = photos.length
+        ? `<dialog class="tour-gallery-dialog" id="tour-gallery"><button class="btn btn-outline" type="button" data-gallery-close>Close photos</button><h2>${tour.destination} photos</h2><div class="tour-gallery-grid">${photos.map(function (photo, index) { const imageScale = photo.startsWith('images/premium-packages/') ? 1 : 1.15; return `<div class="img-wrap"><img src="${photo}" alt="${tour.destination} photo ${index + 1}" style="transform:scale(${imageScale})" loading="lazy" decoding="async"></div>`; }).join('')}</div></dialog>`
+        : '';
+      const relatedLinks = country === 'Botswana'
+        ? '<section class="tour-related-links"><h2>Related Links</h2><a href="tours.html?country=Botswana&amp;destination=Okavango%20Delta">Okavango Delta Luxury Safaris</a> · <a href="tours.html?country=Botswana&amp;destination=Okavango%20Delta">Botswana Honeymoon Safaris</a></section>'
+        : '';
+      const mapLabel = `${country} Map`;
+      const description = tour.description || tour.destination;
+      const durationLabel = tour.durationLabel || (Number(tour.days) === 0.5
+        ? 'Half Day'
+        : `${tour.days} ${Number(tour.days) === 1 ? 'Day' : 'Days'}`);
+      const operatorLabel = tour.operator && tour.operator !== 'Pascal Travels'
+        ? `Operator: ${tour.operator}`
+        : 'Offered By: Pascal Travels';
+      const featureMarkup = tour.features && tour.features.length
+        ? `<h3>Package features</h3><ul>${tour.features.map(function (item) { return `<li>${item}</li>`; }).join('')}</ul>`
+        : '';
+      const activityMarkup = tour.activities && tour.activities.length
+        ? `<h3>Activities</h3><ul>${tour.activities.map(function (item) { return `<li>${item}</li>`; }).join('')}</ul>`
+        : '';
+      host.innerHTML = `
+        <header class="tour-detail-hero">
+          <div class="tour-detail-image img-wrap"><img src="${tour.image}" alt="${tour.destination}" style="object-position:${tour.imagePosition || 'center'};transform:scale(${tour.imageScale || 1.15})" fetchpriority="high" /></div>
+          <div><span class="eyebrow text-gold">${durationLabel} · ${country}</span><h1>${tour.destination}</h1><p class="tour-offer-meta">${operatorLabel} ${reviews ? `· ${reviews}` : ''}</p><p>${description}</p></div>
+        </header>
+        <div class="tour-detail-columns">
+          <div>
+            <div class="tour-detail-tabs" role="tablist" aria-label="Tour details">
+              <button type="button" role="tab" aria-selected="true" data-detail-tab="overview">Overview</button>
+              <button type="button" role="tab" aria-selected="false" data-detail-tab="day-by-day">Day by Day</button>
+              <button type="button" role="tab" aria-selected="false" data-detail-tab="rates">Rates</button>
+              <button type="button" role="tab" aria-selected="false" data-detail-tab="inclusions">Inclusions</button>
+              <button type="button" role="tab" aria-selected="false" data-detail-tab="getting-there">Getting There</button>
+              <button type="button" role="tab" aria-selected="false" data-detail-tab="offered-by">Offered By</button>
+            </div>
+            <section class="tour-detail-panel" data-detail-panel="overview">
+              <h2>Overview</h2><p>${description}</p><p>${tour.partyType || 'Private tour'} · ${tour.level} · ${tour.accommodationType || 'Lodge/Camp/Resort'} · ${tour.transport || 'Pop-up roof 4x4'} · ${mealsSummary}.</p>
+              <h3>Route</h3><p>${route.join(' → ')}</p><div class="tour-map-layout">${mapMarkup}<aside class="tour-map-preview"><strong>${mapLabel}</strong><button class="btn btn-outline btn-sm" type="button" data-gallery-open>Open Photos (${photoCount})</button></aside></div>
+              <section class="tour-destination-info"><h2>Main Destination: ${destinationInfo.name}</h2><div class="tour-info-cards"><div><strong>Best Time To Visit</strong><span>${destinationInfo.bestTime}</span></div><div><strong>High Season</strong><span>${destinationInfo.highSeason}</span></div><div><strong>Best Weather</strong><span>${destinationInfo.bestWeather}</span></div></div></section>
+              <section class="tour-wildlife"><h2>Wildlife in ${destinationInfo.name}</h2><div class="tour-wildlife-list">${wildlifeMarkup}</div>${wildlife.length > 6 ? '<button class="btn btn-outline btn-sm" type="button" data-wildlife-toggle aria-expanded="false">Show more wildlife</button>' : ''}</section>
+              ${relatedLinks}
+            </section>
+            <section class="tour-detail-panel" data-detail-panel="day-by-day" hidden><h2>Day by Day</h2>${dayPlanRows || '<p>Contact Pascal Travels for the day-by-day itinerary.</p>'}</section>
+            <section class="tour-detail-panel" data-detail-panel="rates" hidden><h2>Rates</h2><table class="tour-rates-table"><tbody>${detailRate}${tour.soloPrice ? `<tr><th>Solo</th><td>$${Number(tour.soloPrice).toLocaleString('en-US')} USD</td></tr>` : ''}</tbody></table><p>Rates are in USD per person unless noted.</p></section>
+            <section class="tour-detail-panel" data-detail-panel="inclusions" id="tour-inclusions" hidden><h2>What is included in this tour</h2><ul>${(tour.inclusions || []).map(function (item) { return `<li>${item}</li>`; }).join('')}${tour.transfer ? `<li>${tour.transfer}</li>` : ''}</ul>${featureMarkup}${activityMarkup}</section>
+            <section class="tour-detail-panel" data-detail-panel="getting-there" hidden><h2>Getting There</h2><p>${route.join(' → ')}</p>${tour.transport ? `<p>${tour.transport}</p>` : ''}<div class="route-stops">${route.map(function (stop, index) { return `<button type="button" class="route-stop" data-route-stop="${index}">${stop}</button>`; }).join('')}</div></section>
+            <section class="tour-detail-panel" data-detail-panel="offered-by" hidden><h2>Offered By</h2><p>Pascal Travels · ${operatorLabel} · ${reviews}</p><p>Pascal Travels can help you plan and book this package.</p></section>
+            <section class="tour-interested"><h2>Interested In This Tour?</h2><a class="btn btn-gold" href="#tour-quote">Request a Quote</a><ul><li>Pascal Travels will help arrange your selected package.</li><li>Your request opens in WhatsApp with your tour details.</li></ul></section>
+          </div>
+          <aside class="tour-sidebar">
+            <section class="card card-white tour-booking-box" id="tour-quote"><p class="eyebrow text-gold">${durationLabel} · ${tour.partyType || 'Private Tour'}</p><h2>${displayedPrice} pp (USD)</h2><p>${tour.level} · ${tour.accommodationType || 'Lodge/Camp/Resort'}</p><p><a href="#tour-inclusions" data-show-inclusions>What is included in this tour</a></p><form class="tour-quote-form" id="tour-quote-form"><label>Start Date<input name="startDate" type="date" value="${startDate}" min="${new Date().toISOString().slice(0, 10)}"></label><label>Travelers<select name="travelers">${Array.from({ length: 10 }, function (_, index) { const count = index + 1; return `<option value="${count}" ${String(count) === travelers ? 'selected' : ''}>${count} ${count === 1 ? 'traveler' : 'travelers'}</option>`; }).join('')}</select></label><button class="btn btn-gold btn-block" type="submit">Request a Quote on WhatsApp</button></form><p><strong>Plan with Pascal Travels</strong></p><p>Your tour and travel details will be prepared in WhatsApp.</p></section>
+            <section class="card card-white tour-accommodation-box"><h2>Accommodation &amp; Meals</h2><p>${tour.accommodationNote || 'Additional accommodation before and at the end of the tour can be arranged for an extra cost.'}</p><div class="tour-compare-scroll"><table class="accommodation-table"><thead><tr><th>Day</th><th>Accommodation</th><th>Meals</th></tr></thead><tbody>${accommodationRows}</tbody></table></div></section>
+          </aside>
+        </div>${galleryMarkup}`;
+
+      host.addEventListener('click', function (event) {
+        const tabButton = event.target.closest('[data-detail-tab]');
+        if (tabButton) {
+          const tab = tabButton.getAttribute('data-detail-tab');
+          host.querySelectorAll('[data-detail-tab]').forEach(function (item) { item.setAttribute('aria-selected', String(item === tabButton)); });
+          host.querySelectorAll('[data-detail-panel]').forEach(function (panel) { panel.hidden = panel.getAttribute('data-detail-panel') !== tab; });
+        }
+        const routeButton = event.target.closest('[data-route-stop]');
+        if (routeButton) {
+          const index = Number(routeButton.getAttribute('data-route-stop'));
+          host.querySelectorAll('[data-route-stop]').forEach(function (item) { item.classList.toggle('route-stop-active', item.getAttribute('data-route-stop') === String(index)); });
+          const dayTab = host.querySelector('[data-detail-tab="day-by-day"]');
+          dayTab.click();
+          const day = host.querySelector(`#tour-day-${Math.min(index + 1, dayPlan.length)}`);
+          if (day) { day.open = true; day.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }
+        if (event.target.closest('[data-gallery-open]')) host.querySelector('#tour-gallery').showModal();
+        if (event.target.closest('[data-gallery-close]')) host.querySelector('#tour-gallery').close();
+        if (event.target.closest('[data-wildlife-toggle]')) {
+          const button = event.target.closest('[data-wildlife-toggle]');
+          const expanded = button.getAttribute('aria-expanded') === 'true';
+          host.querySelectorAll('[data-wildlife-extra]').forEach(function (item) { item.hidden = expanded; });
+          button.setAttribute('aria-expanded', String(!expanded));
+          button.textContent = expanded ? 'Show more wildlife' : 'Show less wildlife';
+        }
+        if (event.target.closest('[data-show-inclusions]')) {
+          event.preventDefault();
+          host.querySelector('[data-detail-tab="inclusions"]').click();
+          host.querySelector('#tour-inclusions').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+      host.addEventListener('keydown', function (event) {
+        if (event.target.matches('.route-map-stop') && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          event.target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      });
+      host.querySelector('#tour-gallery')?.addEventListener('click', function (event) {
+        if (event.target === event.currentTarget) event.currentTarget.close();
+      });
+      host.querySelector('#tour-quote-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const message = [
+          `Hello Pascal Travels, please send me a quote for ${tour.destination}.`,
+          `Country: ${country}`,
+          `Duration: ${durationLabel}`,
+          `Price per person: ${displayedPrice} USD`,
+          `Operator: ${tour.operator || 'Pascal Travels'}`,
+          `Route: ${route.join(' → ')}`,
+          `Travelers: ${formData.get('travelers')}`,
+          formData.get('startDate') ? `Start date: ${formData.get('startDate')}` : '',
+          `Currency: ${currency}`
+        ].filter(Boolean).join('\n');
+        window.location.href = window.PascalWhatsApp.createWhatsAppUrl(message);
+      });
+    });
+  </script>
+</body>
+</html>

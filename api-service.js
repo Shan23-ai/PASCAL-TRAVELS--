@@ -65,7 +65,7 @@ class APIService {
     return this.fetch(`/api/agents/${agentId}`, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     });
   }
@@ -75,7 +75,7 @@ class APIService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(candidateData)
     });
@@ -84,7 +84,7 @@ class APIService {
   async getAgentCandidates(agentId, token) {
     return this.fetch(`/api/agents/${agentId}/candidates`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     });
   }
@@ -92,7 +92,7 @@ class APIService {
   async getAgentCommissions(agentId, token) {
     return this.fetch(`/api/agents/${agentId}/commissions`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
       }
     });
   }
@@ -109,6 +109,6 @@ window.api = new APIService();
 // Health check on load
 document.addEventListener('DOMContentLoaded', () => {
   window.api.health()
-    .then(() => console.log('✓ Backend API is online'))
-    .catch(() => console.warn('⚠ Backend API unavailable - using demo mode'));
+    .then(() => console.log('âœ“ Backend API is online'))
+    .catch(() => console.warn('âš  Backend API unavailable - using demo mode'));
 });

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Start a visa application with Pascal Travels." />
+  <title>Visa Application | Pascal Travels</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="backgrounds.js" defer></script>
+</head>
+<body>
+  <nav id="navbar" class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="brand"><span class="brand-text">Pascal<span class="brand-accent">Travels</span><em>&amp; Tour</em></span></a>
+      <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul id="nav-links" class="nav-links">
+        <li><a href="index.html">Home</a></li><li><a href="tours.html">Travel Packages</a></li><li><a href="jobs.html">Jobs Abroad</a></li><li><a href="visa.html">Visa Application</a></li><li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="app-root">
+    <section class="section">
+      <div class="container">
+        <a href="visa.html">← Back to visa options</a>
+        <header class="section-header">
+          <span class="eyebrow text-gold">VISA SERVICES</span>
+          <h1 class="section-title">Visa Application</h1>
+          <p id="visa-application-summary" class="section-sub" aria-live="polite"></p>
+        </header>
+        <form id="visa-application-form" class="card card-white form-grid-2 visa-application-form">
+          <label>Full name<input name="name" autocomplete="name" required /></label>
+          <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+          <label>Phone number<input name="phone" type="tel" autocomplete="tel" required /></label>
+          <label>Nationality<input name="nationality" autocomplete="country-name" required /></label>
+          <label id="visa-type-field">Visa type<select id="visa-type" name="visaType" required></select></label>
+          <label id="visa-date-field"><span id="visa-date-label">Intended travel / start date</span><input name="date" type="date" /></label>
+          <div class="full">
+            <h2>Supporting documents</h2>
+            <p>Select any documents you already have. If you do not have all the required documents, let us know below so we can assist. Your files are not attached automatically; attach them in WhatsApp after continuing.</p>
+            <div id="visa-document-fields" class="form-grid-2"></div>
+          </div>
+          <label class="full">Documents you are missing or need help obtaining
+            <textarea name="missingDocuments" rows="3" placeholder="Tell us which required documents you do not have yet, or what assistance you need."></textarea>
+          </label>
+          <button id="visa-application-submit" type="submit" class="btn btn-gold">Continue by WhatsApp</button>
+          <p id="visa-application-notice" class="full" role="status">Your application details will be prepared in WhatsApp. Attach selected documents before sending.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <footer class="section section-dark"><div class="container footer-bottom"><span><a href="#" data-whatsapp-link data-whatsapp-message="Hello Pascal Travels, I have a question about a visa application.">WhatsApp Pascal Travels</a></span><span class="kws-association">In association with KWS <img src="images/kws-logo.jpg" alt="Kenya Wildlife Service logo" /></span><span>Developed by Remontada.co.</span></div></footer>
+  <script src="data/requirements.js"></script>
+  <script src="data/packages.js"></script>
+  <script src="whatsapp.js"></script>
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', function () {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const packages = window.PACKAGES_DATA || {};
+      const visaId = new URLSearchParams(window.location.search).get('visa');
+      const visa = [
+        ...(packages.travelVisas || []),
+        ...(packages.workVisas || []),
+        ...(packages.studyVisas || []),
+        ...(packages.canadaPR || [])
+      ].find(function (item) { return item.id === visaId; });
+      const summary = document.getElementById('visa-application-summary');
+      const submit = document.getElementById('visa-application-submit');
+      const form = document.getElementById('visa-application-form');
+
+      if (!visa) {
+        summary.textContent = 'Visa option not found. Return to Visa Application and choose an available option.';
+        submit.disabled = true;
+        form.hidden = true;
+        return;
+      }
+
+      const categoryNames = {
+        'travel-visa': 'Tourist visa',
+        'work-visa': 'Work visa',
+        'study-visa': 'Study visa',
+        'canada-pr': 'Permanent residency'
+      };
+      summary.textContent = `${categoryNames[visa.category] || 'Visa'} · ${visa.country}${visa.city ? ` · ${visa.city}` : ''}`;
+
+      const visaTypeField = document.getElementById('visa-type-field');
+      const visaTypeSelect = document.getElementById('visa-type');
+      const visaTypes = visa.visaTypes || (visa.visaType ? [visa.visaType] : visa.stream ? [visa.stream] : []);
+      if (visaTypes.length) {
+        visaTypes.forEach(function (type) {
+          const option = document.createElement('option');
+          option.value = type;
+          option.textContent = type;
+          visaTypeSelect.appendChild(option);
+        });
+      } else {
+        visaTypeSelect.required = false;
+        visaTypeField.hidden = true;
+      }
+
+      const dateField = document.getElementById('visa-date-field');
+      if (visa.category === 'travel-visa') {
+        document.getElementById('visa-date-label').textContent = 'Intended travel date';
+      } else if (visa.category === 'work-visa') {
+        document.getElementById('visa-date-label').textContent = 'Intended start date';
+      } else if (visa.category === 'study-visa') {
+        document.getElementById('visa-date-label').textContent = 'Intended course start date';
+      } else if (visa.category === 'canada-pr') {
+        dateField.hidden = true;
+      }
+
+      const requirements = window.REQUIREMENTS_DATA || {};
+      const documentFields = document.getElementById('visa-document-fields');
+      (visa.requirements || []).forEach(function (requirementId) {
+        const requirement = requirements[requirementId];
+        const label = document.createElement('label');
+        const title = requirement ? requirement.title : requirementId;
+        const formats = requirement && requirement.formats ? requirement.formats : ['PDF', 'JPG', 'PNG'];
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = `document-${requirementId}`;
+        input.accept = formats.map(function (format) { return `.${format.toLowerCase()}`; }).join(',');
+        label.append(`${title} (${formats.join(', ')})`, input);
+        documentFields.appendChild(label);
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const data = new FormData(form);
+        const selectedFiles = Array.from(form.querySelectorAll('input[type="file"]'))
+          .filter(function (input) { return input.files && input.files.length; })
+          .map(function (input) { return `${input.previousSibling.textContent}: ${input.files[0].name}`; });
+        const message = [
+          `Visa application: ${visa.country}${visa.stream ? ` - ${visa.stream}` : ''}`,
+          `Visa category: ${categoryNames[visa.category] || 'Visa'}`,
+          `Name: ${data.get('name')}`,
+          `Email: ${data.get('email')}`,
+          `Phone: ${data.get('phone')}`,
+          `Nationality: ${data.get('nationality')}`,
+          data.get('visaType') ? `Visa type: ${data.get('visaType')}` : '',
+          data.get('date') ? `Intended date: ${data.get('date')}` : '',
+          data.get('missingDocuments') ? `Documents missing / assistance needed:\n${data.get('missingDocuments')}` : '',
+          selectedFiles.length ? `Selected documents:\n${selectedFiles.join('\n')}` : 'Documents: I will attach them in WhatsApp.',
+          'I will attach my documents to this WhatsApp chat.'
+        ].filter(Boolean).join('\n');
+        window.location.href = window.PascalWhatsApp.createWhatsAppUrl(message);
+        document.getElementById('visa-application-notice').textContent = data.get('missingDocuments')
+          ? 'WhatsApp opened. Your request for help with missing documents is included; attach any selected files before sending.'
+          : 'WhatsApp opened. Attach your selected documents before sending your application.';
+      });
+    });
+  </script>
+</body>
+</html>

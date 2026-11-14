@@ -14,65 +14,40 @@
     personalInfo: {},
     uploadedDocs: {},
     totalProcessing: 0,
-    totalTicket: 0
+    totalTicket: 0,
+    tourSearch: { packageId: '', country: '', destination: '', startDate: '', travelers: '2', currency: 'USD' }
   };
 
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
   const DEFAULT_CURRENCY = 'USD';
-  const CURRENCY_SYMBOLS = { USD: '$', EUR: '€', KES: 'KES ' };
+  const CURRENCY_SYMBOLS = { USD: '$', EUR: 'â‚¬', KES: 'KES ', GBP: 'Â£' };
   function money(n, currency = DEFAULT_CURRENCY) {
     const sym = CURRENCY_SYMBOLS[currency] || CURRENCY_SYMBOLS.USD;
     return `${sym}${Number(n || 0).toLocaleString('en-US')}`;
   }
   const currencyOf = p => (p && p.processingCurrency) ? p.processingCurrency : DEFAULT_CURRENCY;
-  const flagUrl = (prompt, size = 'square_hd') => {
-    // Map content keywords to themed image categories for context-appropriate visuals
-    const categoryMap = {
-      safari: { keywords: ['safari', 'wildlife', 'lions', 'zebras', 'elephants', 'masai'], seeds: [100, 101, 102, 103, 104, 105] },
-      gorilla: { keywords: ['gorilla', 'trekking', 'bwindi', 'forest', 'mountains'], seeds: [110, 111, 112, 113, 114] },
-      serengeti: { keywords: ['serengeti', 'migration', 'plains', 'wildebeest'], seeds: [115, 116, 117, 118] },
-      zanzibar: { keywords: ['zanzibar', 'beach', 'sand', 'island', 'ocean', 'tropical'], seeds: [120, 121, 122, 123] },
-      mombasa: { keywords: ['mombasa', 'coast', 'diani', 'reef'], seeds: [125, 126, 127] },
-      dubai: { keywords: ['dubai', 'burj', 'khalifa', 'uae', 'emirates', 'luxury'], seeds: [200, 201, 202, 203, 204] },
-      marina: { keywords: ['marina', 'yacht', 'boat'], seeds: [205, 206, 207] },
-      desert: { keywords: ['desert', 'dune', 'sand'], seeds: [210, 211, 212] },
-      canada: { keywords: ['canada', 'toronto', 'vancouver', 'maple'], seeds: [300, 301, 302] },
-      mountain: { keywords: ['mountain', 'peak', 'snow'], seeds: [303, 304, 305] },
-      job: { keywords: ['job', 'office', 'work', 'professional', 'career', 'tech'], seeds: [400, 401, 402, 403] },
-      nurse: { keywords: ['nurse', 'healthcare', 'medical'], seeds: [410, 411, 412] }
-    };
-
-    // Determine category and select seed based on prompt content
-    let selectedSeeds = categoryMap.safari.seeds; // default to safari
-    
-    for (const [category, { keywords, seeds }] of Object.entries(categoryMap)) {
-      if (keywords.some(kw => prompt.toLowerCase().includes(kw))) {
-        selectedSeeds = seeds;
-        break;
-      }
+  const missingImageNotices = new Set();
+  function logMissingImage(key, message) {
+    if (missingImageNotices.has(key)) return;
+    console.log(`[Pascal Travels] ${message}`);
+    missingImageNotices.add(key);
+  }
+  function visaImageFor(packageData) {
+    const category = packageData.category;
+    const countryCode = packageData.countryCode;
+    if (category === 'canada-pr' || (['work-visa', 'study-visa'].includes(category) && countryCode === 'CA')) {
+      return 'images/visa/Canada.jpg';
     }
-
-    // Create deterministic but varied seed selection based on prompt
-    let hash = 0;
-    for (let i = 0; i < prompt.length; i++) {
-      hash = ((hash << 5) - hash) + prompt.charCodeAt(i);
+    if (['work-visa', 'study-visa'].includes(category) && countryCode === 'CZ') return 'images/visa/CZ.jpg';
+    const availableCodes = new Set(['AE', 'AU', 'BH', 'CA', 'DE', 'EE', 'GB', 'GE', 'IN', 'KZ', 'LV', 'ME', 'OM', 'PL', 'PT', 'QA', 'RS', 'SA', 'SK', 'US']);
+    if (availableCodes.has(countryCode)) return `images/visa/${countryCode}.jpg`;
+    if (['work-visa', 'study-visa'].includes(category)) {
+      logMissingImage(`visa-${countryCode}`, `No country-specific visa photo found for ${packageData.country}; add images/visa/${countryCode}.jpg.`);
     }
-    const seed = selectedSeeds[Math.abs(hash) % selectedSeeds.length];
-
-    // Determine dimensions
-    let width = 600;
-    let height = 600;
-    if (size === 'landscape_4_3') {
-      width = 1200;
-      height = 900;
-    }
-
-    // Use picsum.photos with semantic seeds for theme-appropriate images
-    // Seed numbers: 100-119 (safari/wildlife), 200-212 (dubai/urban), 300-305 (canada/nature), 400-412 (jobs/professional)
-    return `https://picsum.photos/seed/${seed}-${prompt.substring(0, 15).replace(/[^a-z0-9]/gi, '')}/${width}/${height}`;
-  };
+    return '';
+  }
 
   function flattenAllPackages() {
     return [
@@ -88,16 +63,84 @@
     return flattenAllPackages().find(p => p.id === id);
   }
 
+  const TOUR_WISHLIST_KEY = 'pascal_tour_wishlist';
+  const TOUR_COMPARE_KEY = 'pascal_tour_compare';
+  function readTourIds(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(value) ? value : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function renderTourComparison() {
+    const host = $('#tour-compare-panel');
+    if (!host) return;
+    const tours = readTourIds(TOUR_COMPARE_KEY).map(findPackage).filter(Boolean);
+    host.hidden = tours.length === 0;
+    if (!tours.length) return;
+    host.innerHTML = `
+      <div class="tour-compare-heading">
+        <h3>Compare tours <span>${tours.length} of 3</span></h3>
+        <button class="tour-tool-button" type="button" data-tour-action="clear-compare">Clear comparison</button>
+      </div>
+      <div class="tour-compare-scroll"><table>
+        <thead><tr><th scope="col">Tour</th>${tours.map(tour => `<th scope="col">${tour.destination}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr><th scope="row">Duration</th>${tours.map(tour => `<td>${tour.days} days</td>`).join('')}</tr>
+          <tr><th scope="row">Price per person</th>${tours.map(tour => `<td>${money(tour.pricePerPerson, currencyOf(tour))}</td>`).join('')}</tr>
+          <tr><th scope="row">Country</th>${tours.map(tour => `<td>${tour.country}</td>`).join('')}</tr>
+        </tbody>
+      </table></div>
+    `;
+  }
+
+  function toggleTourCollection(action, id) {
+    const key = action === 'wishlist' ? TOUR_WISHLIST_KEY : TOUR_COMPARE_KEY;
+    const ids = readTourIds(key);
+    if (action === 'clear-compare') {
+      try { localStorage.removeItem(TOUR_COMPARE_KEY); } catch (error) { showToast('Comparison storage is unavailable.', 'error'); }
+      renderTourComparison();
+      renderTours();
+      return;
+    }
+    if (action === 'compare' && !ids.includes(id) && ids.length >= 3) {
+      showToast('Compare up to three tours at a time.', 'info');
+      return;
+    }
+    const selected = ids.includes(id);
+    const next = selected ? ids.filter(item => item !== id) : [...ids, id];
+    try { localStorage.setItem(key, JSON.stringify(next)); }
+    catch (error) { showToast('Your browser could not save this selection.', 'error'); return; }
+    renderTours();
+    renderTourComparison();
+    showToast(selected ? 'Removed from your list.' : action === 'wishlist' ? 'Saved to your wishlist.' : 'Added to comparison.');
+  }
+
   function getPackageMeta(p) {
     if (!p) return {};
     const processing = typeof p.priceProcessing === 'number' ? p.priceProcessing : (p.pricePerPerson || 0);
     const ticket = typeof p.priceTicket === 'number' ? p.priceTicket : (p.pricePerPerson ? 0 : 0);
-    const flag = p.flag || '🌍';
+    const flag = p.flag || 'ðŸŒ';
     const title = p.country || p.destination || p.stream || 'Package';
     const subtitle = p.city || p.country || p.destination || '';
     const est = p.estimatedDays || (p.days ? `${p.days} days` : 'Varies');
     const currency = currencyOf(p);
     return { processing, ticket, flag, title, subtitle, est, currency };
+  }
+
+  function formatVisaEstimate(estimate) {
+    const formatted = String(estimate || 'Varies').trim().replace(/(\d)\s*-\s*(?=\d)/g, '$1\u2013');
+    return /^\d+(?:\u2013\d+)?$/.test(formatted) ? `${formatted} days` : formatted;
+  }
+
+  function isVisaPackage(p) {
+    return ['travel-visa', 'work-visa', 'study-visa', 'canada-pr'].includes(p.category);
+  }
+
+  function formatPackageEstimate(p, estimate) {
+    return isVisaPackage(p) ? formatVisaEstimate(estimate) : estimate;
   }
 
   // ============= REFERRAL SYSTEM =============
@@ -133,7 +176,7 @@
     return {
       code: code,
       shareLink: `${window.location.origin}/?ref=${code}`,
-      headline: `Exciting job openings in Canada – Apply Now! 🎯`
+      headline: `Exciting job openings in Canada â€“ Apply Now! ðŸŽ¯`
     };
   }
 
@@ -171,7 +214,7 @@
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       `;
       banner.innerHTML = `
-        <strong>👋 Welcome!</strong> You were referred by <strong>${referral.referrerName}</strong>. 
+        <strong>ðŸ‘‹ Welcome!</strong> You were referred by <strong>${referral.referrerName}</strong>. 
         Enjoy exclusive benefits when you sign up today!
       `;
       document.body.insertBefore(banner, document.body.firstChild);
@@ -244,7 +287,7 @@
         <p style="margin-top:.2rem;">${s.tagline}</p>
         <p style="font-size:.9rem;">${s.description}</p>
         <div class="service-features">
-          ${s.features.map(f => `<div>✔ ${f}</div>`).join('')}
+          ${s.features.map(f => `<div>âœ” ${f}</div>`).join('')}
         </div>
         <button class="btn btn-gold btn-sm" data-service="${s.id}">Explore ${s.shortName}</button>
       </div>
@@ -256,20 +299,22 @@
     const cur = meta.currency;
     const tags = p.popularTags || p.visaTypes || p.industries || p.degreeLevels || p.popularPNPs || [];
     const estText = meta.est;
+    const formattedEstimate = formatVisaEstimate(estText);
     const priceShow = p.pricePerPerson ? money(p.pricePerPerson, cur) + ' / pp' : money(meta.processing + meta.ticket, cur);
     const fromLabel = p.pricePerPerson ? 'From' : 'Total from';
-    const imagePrompt = `${p.country || meta.title} breathtaking panoramic destination image, famous landmarks, modern city skyline, scenic nature, vibrant colors, professional travel photography, cinematic lighting, ultra realistic, 4K`;
-    const imageUrl = flagUrl(imagePrompt, 'landscape_4_3');
+    const imageUrl = visaImageFor(p);
+    const visaType = p.category === 'travel-visa' ? 'Tourist' : p.category === 'work-visa' ? 'Work' : p.category === 'study-visa' ? 'Study' : 'Permanent Residency';
 
     return `
       <div class="visa-card" data-package="${p.id}">
         <div class="visa-card-visual">
-          <img src="${imageUrl}" alt="${meta.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 800 500%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x1=%220%22 x2=%221%22 y1=%220%22 y2=%221%22%3E%3Cstop stop-color=%22%2387CEEB%22/%3E%3Cstop offset=%221%22 stop-color=%22%23E0F4FF%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill=%22url(%23g)%22 width=%22800%22 height=%22500%22/%3E%3C/svg%3E';this.style.objectFit='cover';" />
+          ${imageUrl ? `<div class="img-wrap"><img src="${imageUrl}" alt="${meta.title}" loading="lazy" decoding="async" /></div>` : ''}
         </div>
         <div class="visa-card-body">
           <div class="visa-card-header">
             <span class="visa-flag">${meta.flag}</span>
-            <span class="visa-est">⏱ ${estText}</span>
+            <span class="visa-type">${visaType}</span>
+            <span class="visa-est" aria-label="Estimated processing time: ${formattedEstimate}"><span class="visa-est-icon" aria-hidden="true">&#9201;</span><span>${formattedEstimate}</span></span>
           </div>
           <h3 class="visa-country">${meta.title}</h3>
           <div class="visa-city">${meta.subtitle}</div>
@@ -280,7 +325,7 @@
               <div class="visa-price-from">${fromLabel}</div>
               <div class="visa-price">${priceShow}</div>
             </div>
-            <button class="btn btn-gold btn-sm" data-select="${p.id}">Details →</button>
+            <a class="btn btn-gold btn-sm" href="visa-apply.html?visa=${encodeURIComponent(p.id)}" data-visa-apply="${p.id}">Apply</a>
           </div>
         </div>
       </div>
@@ -288,30 +333,88 @@
   }
 
   function renderTourCard(p) {
-    const meta = getPackageMeta(p);
-    const cur = meta.currency;
-    const img = p.packageImage ? flagUrl(p.packageImage, 'landscape_4_3') : '';
+    const img = p.image || '';
+    const isSaved = readTourIds(TOUR_WISHLIST_KEY).includes(p.id);
+    const route = (p.route || []).join(' Â· ');
+    const tourParams = new URLSearchParams({ id: p.id });
+    ['startDate', 'travelers', 'currency'].forEach(key => {
+      const value = appState.tourSearch[key];
+      if (value) tourParams.set(key, value);
+    });
+    const tourUrl = `tour.html?${tourParams.toString()}`;
+    const minPrice = p.priceMin ?? p.pricePerPerson;
+    const maxPrice = p.priceMax;
+    const price = p.priceDisplay || formatTourPrice(minPrice, maxPrice, p.pricePerPerson);
+    const tourType = p.durationType || p.level || 'Tour package';
+    const operator = p.operator || 'Pascal Travels';
+    const durationLabel = p.durationLabel || (Number(p.days) === 0.5
+      ? 'Half Day'
+      : `${p.days} ${Number(p.days) === 1 ? 'Day' : 'Days'}`);
+    const rating = getTourRating(p);
+    const reviewCount = Number.isInteger(Number(p.reviewCount)) && Number(p.reviewCount) > 0
+      ? Number(p.reviewCount)
+      : 0;
+    const reviewLabel = reviewCount ? `${reviewCount.toLocaleString('en-US')} reviews` : 'Rating';
+    const accolade = getTourAccolade(p, rating);
     return `
       <div class="tour-card" data-package="${p.id}">
-        <div class="tour-img">
-          ${img ? `<img src="${img}" alt="${p.destination}" onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,var(--skyblue),var(--golden))'">` : ''}
+        <div class="tour-img img-wrap">
+          ${img ? `<img src="${img}" alt="${p.destination}" style="object-position:${p.imagePosition || 'center'};transform:scale(${p.imageScale || 1})" loading="lazy" decoding="async" />` : ''}
+          ${accolade ? `<span class="tour-accolade tour-accolade--${accolade.theme}"><span class="tour-accolade-tails" aria-hidden="true"><span></span><span></span></span><span class="tour-accolade-medal" aria-hidden="true">✦</span><span class="tour-accolade-label">${accolade.label}</span></span>` : ''}
+          <button class="tour-tool-button tour-save-overlay${isSaved ? ' is-saved' : ''}" type="button" data-tour-action="wishlist" data-tour-id="${p.id}" aria-pressed="${isSaved}" aria-label="${isSaved ? 'Remove' : 'Save'} ${p.destination} ${isSaved ? 'from' : 'to'} wishlist">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"></path></svg>
+          </button>
+          <h3 class="tour-image-title">${p.destination}</h3>
         </div>
         <div class="tour-body">
           <div class="tour-head">
-            <h3 style="margin:0;">${meta.flag} ${p.destination}</h3>
-            <span class="tour-days">${p.days} Days</span>
+            <h3 style="margin:0;">${p.destination}</h3>
+            <span class="tour-days"><span aria-hidden="true">◷</span>${durationLabel}</span>
           </div>
-          <p style="font-size:.88rem;margin:0;">${p.description}</p>
-          <div class="tour-includes">
-            ${(p.inclusions || []).slice(0, 4).map(i => `<span>✔ ${i.split(' ')[0]} ${i.split(' ').slice(1,3).join(' ')}</span>`).join('')}
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;">
-            <div class="tour-price">${money(p.pricePerPerson, cur)}<span style="font-size:.75rem;color:var(--text-muted);font-weight:600;"> / person</span></div>
-          </div>
-          <button class="btn btn-gold btn-sm" data-select="${p.id}">Select Package →</button>
+          <div class="tour-price">${price}<span> pp</span></div>
+          ${p.soloPrice ? `<p class="tour-solo-price">2+ travelers $${Number(p.pricePerPerson).toLocaleString('en-US')} / solo $${Number(p.soloPrice).toLocaleString('en-US')}</p>` : ''}
+          <p class="tour-operator"><strong>Operator:</strong> ${operator}</p>
+          <p class="tour-summary">${p.country}: ${tourType} · ${p.partyType || 'Private tour'}</p>
+          <p class="tour-route"><strong>You Visit:</strong> ${route}</p>
+          <p class="tour-rating" aria-label="Rating ${rating} out of 5${reviewCount ? `, ${reviewLabel}` : ''}"><span class="tour-rating-star" aria-hidden="true">★</span> <span>${rating}</span> <span class="tour-rating-label">${reviewLabel}</span></p>
+          <div class="tour-card-actions"><a class="btn btn-outline btn-sm" href="${tourUrl}">View Details</a></div>
         </div>
       </div>
     `;
+  }
+
+  function formatTourPrice(minPrice, maxPrice, fallbackPrice) {
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+    const formattedMin = Number.isFinite(min) && min > 0 ? `$${min.toLocaleString('en-US')}` : '';
+    const formattedMax = Number.isFinite(max) && max > 0 ? `$${max.toLocaleString('en-US')}` : '';
+    if (formattedMin && formattedMax) return min === max ? formattedMin : `${formattedMin}&ndash;${formattedMax}`;
+    if (formattedMin) return formattedMin;
+    if (formattedMax) return formattedMax;
+    const fallback = Number(fallbackPrice);
+    return Number.isFinite(fallback) && fallback > 0 ? `$${fallback.toLocaleString('en-US')}` : 'Price on request';
+  }
+
+  function getTourRating(tour) {
+    const suppliedRating = Number(tour.rating);
+    if (Number.isFinite(suppliedRating) && suppliedRating >= 0 && suppliedRating <= 5) {
+      return suppliedRating.toFixed(1);
+    }
+    let hash = 0;
+    for (const char of tour.id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    return (4.2 + (hash % 8) / 10).toFixed(1);
+  }
+
+  function getTourAccolade(tour, rating) {
+    if (!tour.prestigious && Number(rating) < 5) return '';
+    const labels = ['Safari Star', 'Wildlife Wonder', 'Golden Getaway', 'Adventure Gem', 'Nature\'s Finest', 'Signature Escape', 'Africa Explorer Pick'];
+    const themes = ['sapphire', 'emerald', 'ruby', 'amethyst', 'coral'];
+    let hash = 0;
+    for (const char of tour.id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    return {
+      label: tour.prestigious ? 'PRESTIGIOUS' : labels[hash % labels.length],
+      theme: themes[hash % themes.length]
+    };
   }
 
   function renderVisaPackages(tab = 'travel') {
@@ -321,16 +424,113 @@
     if (tab === 'travel') list = PKG.travelVisas || [];
     if (tab === 'work') list = PKG.workVisas || [];
     if (tab === 'study') list = PKG.studyVisas || [];
+    if (tab === 'pr') list = PKG.canadaPR || [];
     host.innerHTML = list.map(renderVisaCard).join('');
   }
 
-  function renderTours() {
+  function renderTours(criteria = appState.tourSearch) {
     const host = $('#tours-grid');
     if (!host) return;
-    showSkeletons('#tours-grid', 3);
-    setTimeout(() => {
-      host.innerHTML = (PKG.eastAfricaTours || []).map(renderTourCard).join('');
-    }, 300);
+    const selectedId = criteria.packageId || '';
+    const tours = (PKG.eastAfricaTours || []).filter(tour => {
+      const countryMatches = !criteria.country || tour.country === criteria.country;
+      const normalizeDestination = value => value.toLowerCase().replace(/\s*\([^)]*\)/g, '').replace(/game reserve/g, 'gr').replace(/national park/g, '').replace(/concession/g, '').trim();
+      const selectedDestination = criteria.destination ? normalizeDestination(criteria.destination) : '';
+      const destinationMatches = !selectedDestination
+        || [...(tour.route || []), ...(tour.highlights || [])].some(stop => {
+          const normalizedStop = normalizeDestination(stop);
+          return normalizedStop === selectedDestination || normalizedStop.includes(selectedDestination) || selectedDestination.includes(normalizedStop);
+        });
+      return (!selectedId || tour.id === selectedId) && countryMatches && destinationMatches;
+    });
+    const isHome = Boolean($('#view-home'));
+    const displayedTours = isHome
+      ? tours.filter((tour, index, list) => list.findIndex(item => item.country === tour.country) === index).slice(0, 4)
+      : tours.slice().sort((first, second) => {
+        const firstDays = first.days == null ? Number.POSITIVE_INFINITY : Number(first.days);
+        const secondDays = second.days == null ? Number.POSITIVE_INFINITY : Number(second.days);
+        return (Number.isFinite(firstDays) ? firstDays : Number.POSITIVE_INFINITY)
+          - (Number.isFinite(secondDays) ? secondDays : Number.POSITIVE_INFINITY);
+      });
+    host.innerHTML = displayedTours.length ? displayedTours.map(renderTourCard).join('') : '<p class="tour-empty">No tours match those filters. Try another destination or trip length.</p>';
+    const status = $('#tour-search-status');
+    if (status) status.textContent = `${displayedTours.length} ${displayedTours.length === 1 ? 'tour' : 'tours'} found`;
+  }
+
+  function initTourSearch() {
+    const form = $('#tour-search');
+    if (!form) return;
+    const tours = PKG.eastAfricaTours || [];
+    const packageSelect = form.querySelector('[name="packageId"]');
+    const destinationSelect = form.querySelector('[name="destination"]');
+    if (packageSelect) {
+      packageSelect.replaceChildren(new Option(`All ${tours.length} packages`, ''));
+      tours.forEach(tour => packageSelect.add(new Option(tour.destination, tour.id)));
+    }
+    const updateDestinations = (country = '') => {
+      if (!destinationSelect) return;
+      const current = destinationSelect.value;
+      const matchingTours = tours.filter(tour => !country || tour.country === country);
+      const destinations = [...new Set(matchingTours.flatMap(tour => [...(tour.route || []), ...(tour.highlights || [])]))]
+        .filter(destination => destination.toLowerCase() !== 'nairobi' && destination.toLowerCase() !== 'maun airport')
+        .sort((a, b) => a.localeCompare(b));
+      if (!country || country === 'Botswana') destinations.push('Moremi GR', 'Khwai', 'Savuti', 'Chobe');
+      const uniqueDestinations = [...new Set(destinations)].sort((a, b) => a.localeCompare(b));
+      destinationSelect.replaceChildren(new Option('All destinations', ''));
+      uniqueDestinations.forEach(destination => destinationSelect.add(new Option(destination, destination)));
+      if (uniqueDestinations.includes(current)) destinationSelect.value = current;
+    };
+    updateDestinations();
+    const countrySelect = form.querySelector('[name="country"]');
+    if (countrySelect) {
+      const currentCountry = countrySelect.value;
+      const countries = [...new Set(tours.map(tour => tour.country).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      countrySelect.replaceChildren(new Option('All countries', ''));
+      countries.forEach(country => countrySelect.add(new Option(country, country)));
+      if (countries.includes(currentCountry)) countrySelect.value = currentCountry;
+    }
+    if (countrySelect) countrySelect.addEventListener('change', () => {
+      updateDestinations(countrySelect.value);
+      updateSearch();
+    });
+    const startDate = $('#tour-start-date');
+    if (startDate) startDate.min = new Date().toISOString().slice(0, 10);
+    const updateSearch = () => {
+      const values = new FormData(form);
+      appState.tourSearch = {
+        packageId: String(values.get('packageId') || ''),
+        country: String(values.get('country') || ''),
+        destination: String(values.get('destination') || ''),
+        startDate: String(values.get('startDate') || ''),
+        travelers: String(values.get('travelers') || '2'),
+        currency: String(values.get('currency') || 'USD')
+      };
+      const currencyNote = $('#tour-currency-note');
+      if (currencyNote) {
+        currencyNote.textContent = appState.tourSearch.currency === 'USD'
+          ? 'Package prices are shown in USD.'
+          : `Package prices are shown in USD; request a ${appState.tourSearch.currency} quote in your enquiry.`;
+      }
+      renderTours(appState.tourSearch);
+    };
+    form.addEventListener('input', updateSearch);
+    form.addEventListener('change', updateSearch);
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      updateSearch();
+      smoothScrollTo('tours');
+    });
+    const query = new URLSearchParams(window.location.search);
+    if (countrySelect && query.has('country')) countrySelect.value = query.get('country');
+    updateDestinations(countrySelect ? countrySelect.value : '');
+    if (destinationSelect && query.has('destination')) destinationSelect.value = query.get('destination');
+    if (packageSelect && query.has('packageId')) packageSelect.value = query.get('packageId');
+    if (startDate && query.has('startDate')) startDate.value = query.get('startDate');
+    const travelersSelect = form.querySelector('[name="travelers"]');
+    const currencySelect = form.querySelector('[name="currency"]');
+    if (travelersSelect && query.has('travelers')) travelersSelect.value = query.get('travelers');
+    if (currencySelect && query.has('currency')) currencySelect.value = query.get('currency');
+    updateSearch();
   }
 
   function renderDubaiPackages() {
@@ -339,7 +539,7 @@
     showSkeletons('#dubai-packages-grid', 2);
     setTimeout(() => {
       host.innerHTML = (PKG.dubaiHolidays || []).map(p => {
-        const img = p.packageImage ? flagUrl(p.packageImage, 'landscape_4_3') : '';
+        const img = p.image || '';
         const basePrice = p.pricingOptions ? p.pricingOptions[0].price : p.pricePerPerson;
         const higherPrice = Math.ceil(basePrice * 1.15); // Show 15% higher as "original" price
         return `
@@ -349,14 +549,14 @@
             </div>
             <h3 style="margin: 0.5rem 0; font-size: 1.1rem;">${p.flag} ${p.destination}</h3>
             <div style="display: flex; gap: 0.5rem; margin: 0.5rem 0; font-size: 0.85rem; color: var(--text-muted);">
-              <span>${p.departureDate} — ${p.returnDate}</span>
-              <span>•</span>
+              <span>${p.departureDate} â€” ${p.returnDate}</span>
+              <span>â€¢</span>
               <span>${p.duration}</span>
             </div>
             <p style="font-size: 0.9rem; margin: 0.5rem 0; color: var(--text-muted);">${p.description}</p>
             <div style="margin: 0.75rem 0; padding: 0.75rem; background: rgba(79, 179, 217, 0.1); border-radius: 8px; font-size: 0.85rem;">
               <div style="font-weight: 600; margin-bottom: 0.25rem;">Highlights:</div>
-              ${(p.inclusions || []).slice(0, 3).map(i => `<div style="margin: 0.25rem 0;">✈️ ${i}</div>`).join('')}
+              ${(p.inclusions || []).slice(0, 3).map(i => `<div style="margin: 0.25rem 0;">âœˆï¸ ${i}</div>`).join('')}
             </div>
             <div style="margin: 0.75rem 0;">
               <span style="font-size: 0.75rem; color: var(--text-muted); text-decoration: line-through; font-weight: 600;">$${higherPrice}</span>
@@ -375,38 +575,9 @@
   function renderCanadaVisual() {
     const img = $('#pr-flag');
     if (!img) return;
-    img.src = flagUrl('Photorealistic Canada maple leaf flag with Ottawa parliament buildings and snowy mountains background, golden hour lighting, high quality', 'landscape_4_3');
-    img.onerror = () => { img.style.background = 'linear-gradient(135deg,#FF0000 0 33%,#FFFFFF 33% 66%,#FF0000 66% 100%)'; img.removeAttribute('src'); };
-  }
-
-  function renderCompactBrandLogo() {
-    const host = document.querySelector('.hero-mini-logo');
-    const brand = document.querySelector('.hero-brand-mini');
-    if (!host) return;
-
-    host.innerHTML = `
-      <div style="
-        width: 54px;
-        height: 54px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 88, 88, 0.16));
-        border: 1px solid rgba(255, 215, 0, 0.45);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-        padding: 6px;
-      ">
-        <img src="assets/logo-main.jpeg" alt="Pascal Travels & Tours logo" style="width:100%;height:100%;object-fit:contain;border-radius:10px;" />
-      </div>
-    `;
-
-    if (brand) {
-      brand.textContent = 'PASCAL TRAVELS';
-      brand.style.fontSize = '0.95rem';
-      brand.style.letterSpacing = '0.16em';
-      brand.style.opacity = '0.95';
-    }
+    img.src = 'images/visa/Canada.jpg';
+    img.loading = 'lazy';
+    img.decoding = 'async';
   }
 
   function selectPackage(id) {
@@ -430,13 +601,15 @@
     hero.innerHTML = `
       <div class="ph-flag">${meta.flag}</div>
       <div style="flex:1;min-width:220px;">
-        <h2>${meta.title}${meta.subtitle ? ' · ' + meta.subtitle : ''}</h2>
+        <h2>${meta.title}${meta.subtitle ? ' Â· ' + meta.subtitle : ''}</h2>
         <p style="color:rgba(255,255,255,0.9);margin:0;">${p.description || ''}</p>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.6rem;">
-          <span class="badge badge-white-gold">⏱ ${meta.est}</span>
-          <span class="badge badge-white-gold">📋 ${(p.requirements || []).length} documents</span>
-          ${p.stream ? `<span class="badge badge-white-gold">🍁 ${p.stream}</span>` : ''}
-          ${p.days ? `<span class="badge badge-white-gold">🗓 ${p.days} days</span>` : ''}
+          <span class="badge badge-white-gold"><span aria-hidden="true">&#9201;</span> ${formatPackageEstimate(p, meta.est)}</span>
+          <span class="badge badge-white-gold">ðŸ“‹ ${(p.requirements || []).length} documents</span>
+          ${p.stream ? `<span class="badge badge-white-gold">ðŸ ${p.stream}</span>` : ''}
+          ${p.days ? `<span class="badge badge-white-gold">ðŸ—“ ${p.days} days</span>` : ''}
+          ${p.category === 'east-africa' && appState.tourSearch.startDate ? `<span class="badge badge-white-gold">ðŸ“… ${appState.tourSearch.startDate}</span>` : ''}
+          ${p.category === 'east-africa' && appState.tourSearch.travelers ? `<span class="badge badge-white-gold">ðŸ‘¥ ${appState.tourSearch.travelers} travelers</span>` : ''}
         </div>
       </div>
     `;
@@ -444,21 +617,21 @@
     const info = $('#package-info');
     const extraDetails = p => {
       const parts = [];
-      if (p.visaTypes) parts.push({ k: 'Visa Types', v: p.visaTypes.join(' · ') });
+      if (p.visaTypes) parts.push({ k: 'Visa Types', v: p.visaTypes.join(' Â· ') });
       if (p.industries) parts.push({ k: 'Industries Hiring', v: p.industries.join(', ') });
       if (p.salaryRange) parts.push({ k: 'Salary Range', v: p.salaryRange });
-      if (p.degreeLevels) parts.push({ k: 'Degree Levels', v: p.degreeLevels.join(' · ') });
+      if (p.degreeLevels) parts.push({ k: 'Degree Levels', v: p.degreeLevels.join(' Â· ') });
       if (p.avgTuition) parts.push({ k: 'Avg Tuition (Year)', v: p.avgTuition });
       if (p.inclusions) parts.push({ k: 'Package Includes', v: '' });
       if (p.minCRS) parts.push({ k: 'Min CRS Score (typical)', v: p.minCRS });
       if (p.settlementFunds) parts.push({ k: 'Settlement Funds Required', v: p.settlementFunds });
-      if (p.highlights) parts.push({ k: 'Tour Highlights', v: p.highlights.join(' · ') });
-      if (p.popularPNPs) parts.push({ k: 'Popular PNPs', v: p.popularPNPs.join(' · ') });
+      if (p.highlights) parts.push({ k: 'Tour Highlights', v: p.highlights.join(' Â· ') });
+      if (p.popularPNPs) parts.push({ k: 'Popular PNPs', v: p.popularPNPs.join(' Â· ') });
       return parts;
     };
 
     info.innerHTML = `
-      <h3 style="margin-bottom:.6rem;">📦 Package Details</h3>
+      <h3 style="margin-bottom:.6rem;">ðŸ“¦ Package Details</h3>
       <div style="display:grid;gap:.55rem;">
         ${extraDetails(p).map(x => `
           <div style="padding:.5rem 0;border-bottom:1px dashed var(--skyblue-soft);font-size:.92rem;">
@@ -480,7 +653,7 @@
         <div>
           <div class="req-title">${r.title}</div>
           <p class="req-desc">${r.description}<br/>
-            <em style="font-style:normal;color:var(--golden-deep);font-weight:600;">Format: ${r.formats.join(', ')} · Max ${r.maxSizeMB}MB</em>
+            <em style="font-style:normal;color:var(--golden-deep);font-weight:600;">Format: ${r.formats.join(', ')} Â· Max ${r.maxSizeMB}MB</em>
           </p>
         </div>
         <div class="req-status">Required</div>
@@ -492,7 +665,7 @@
       $('#price-processing').textContent = money(p.pricePerPerson, meta.currency);
       $('#price-ticket').textContent = money(0, meta.currency);
       $('#price-total').textContent = money(p.pricePerPerson, meta.currency);
-      $('#btn-start-app').textContent = `Book Tour · ${money(p.pricePerPerson, meta.currency)} →`;
+      $('#btn-start-app').textContent = `Book Tour Â· ${money(p.pricePerPerson, meta.currency)} â†’`;
       const rowLabel1 = $('#price-row-1-label');
       if (rowLabel1) rowLabel1.textContent = 'Tour Price (per person)';
       const rowLabel2 = $('#price-row-2-label');
@@ -505,7 +678,7 @@
       $('#price-processing').textContent = money(meta.processing, meta.currency);
       $('#price-ticket').textContent = money(meta.ticket, meta.currency);
       $('#price-total').textContent = money(meta.processing + meta.ticket, meta.currency);
-      $('#btn-start-app').textContent = `Start Application · ${money(meta.processing + meta.ticket, meta.currency)} →`;
+      $('#btn-start-app').textContent = `Start Application Â· ${money(meta.processing + meta.ticket, meta.currency)} â†’`;
     }
   }
 
@@ -592,20 +765,20 @@
           <div>
             <div class="doc-head">
               <div class="doc-title">${r.title}</div>
-              <span class="status-chip ${u && u.uploaded ? 'ok' : 'pending'}">${u && u.uploaded ? '✔ Submitted' : 'Pending'}</span>
+              <span class="status-chip ${u && u.uploaded ? 'ok' : 'pending'}">${u && u.uploaded ? 'âœ” Submitted' : 'Pending'}</span>
             </div>
             <p class="doc-hint">${r.description}</p>
-            <p class="file-input-hint">Accepts ${r.formats.join(', ')} · up to ${r.maxSizeMB}MB</p>
+            <p class="file-input-hint">Accepts ${r.formats.join(', ')} Â· up to ${r.maxSizeMB}MB</p>
           </div>
           <div>
             ${u && u.uploaded ? `
               <div class="doc-preview">
-                📎 <span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${u.fileName}</span>
-                <span class="remove-doc" data-remove="${r.id}">✕</span>
+                ðŸ“Ž <span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${u.fileName}</span>
+                <span class="remove-doc" data-remove="${r.id}">âœ•</span>
               </div>
             ` : `
               <label class="btn-upload">
-                ⬆ Upload
+                â¬† Upload
                 <input type="file" style="display:none" data-upload="${r.id}" accept="${r.formats.map(f => '.' + f.toLowerCase().replace('jpg', 'jpeg')).join(',')}" />
               </label>
             `}
@@ -628,7 +801,7 @@
     const missing = reqs.filter(r => !appState.uploadedDocs[r.id] || !appState.uploadedDocs[r.id].uploaded);
     if (missing.length === 0) return { ok: true, missing };
     const errEl = $('#doc-errors');
-    errEl.innerHTML = `⚠ ${missing.length} required document${missing.length === 1 ? '' : 's'} still missing: <strong>${missing.map(m => m.title).join(', ')}</strong>`;
+    errEl.innerHTML = `âš  ${missing.length} required document${missing.length === 1 ? '' : 's'} still missing: <strong>${missing.map(m => m.title).join(', ')}</strong>`;
     errEl.style.display = 'block';
     return { ok: false, missing };
   }
@@ -676,33 +849,33 @@
     summary.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.3rem;">
         <div>
-          <h4 style="color:var(--skyblue-navy);margin-bottom:.6rem;">🎫 Package</h4>
+          <h4 style="color:var(--skyblue-navy);margin-bottom:.6rem;">ðŸŽ« Package</h4>
           <div style="padding:1rem;background:var(--skyblue-pale);border-radius:12px;">
             <div style="font-size:2rem;margin-bottom:.3rem;">${meta.flag}</div>
             <strong style="font-size:1.05rem;">${meta.title}</strong>
             <div style="font-size:.88rem;color:var(--text-muted);">${meta.subtitle}</div>
-            <div style="margin-top:.5rem;font-size:.85rem;color:var(--text-muted);">⏱ ${meta.est}</div>
+            <div style="margin-top:.5rem;font-size:.85rem;color:var(--text-muted);"><span aria-hidden="true">&#9201;</span> ${formatPackageEstimate(p, meta.est)}</div>
           </div>
-          <h4 style="color:var(--skyblue-navy);margin:1rem 0 .6rem;">👤 Applicant</h4>
+          <h4 style="color:var(--skyblue-navy);margin:1rem 0 .6rem;">ðŸ‘¤ Applicant</h4>
           <div style="display:grid;gap:.35rem;font-size:.88rem;">
-            <div><strong>Name:</strong> ${pi.fullName || '—'}</div>
-            <div><strong>Email:</strong> ${pi.email || '—'}</div>
-            <div><strong>Phone:</strong> ${pi.phone || '—'}</div>
-            <div><strong>Passport:</strong> ${pi.passport || '—'}</div>
-            <div><strong>DOB:</strong> ${pi.dob || '—'}</div>
-            <div><strong>Nationality:</strong> ${pi.nationality || '—'}</div>
-            <div><strong>Address:</strong> ${pi.address || '—'}</div>
+            <div><strong>Name:</strong> ${pi.fullName || 'â€”'}</div>
+            <div><strong>Email:</strong> ${pi.email || 'â€”'}</div>
+            <div><strong>Phone:</strong> ${pi.phone || 'â€”'}</div>
+            <div><strong>Passport:</strong> ${pi.passport || 'â€”'}</div>
+            <div><strong>DOB:</strong> ${pi.dob || 'â€”'}</div>
+            <div><strong>Nationality:</strong> ${pi.nationality || 'â€”'}</div>
+            <div><strong>Address:</strong> ${pi.address || 'â€”'}</div>
           </div>
         </div>
         <div>
-          <h4 style="color:var(--skyblue-navy);margin-bottom:.6rem;">📋 Documents (${countDoneDocs()}/${reqs.length})</h4>
+          <h4 style="color:var(--skyblue-navy);margin-bottom:.6rem;">ðŸ“‹ Documents (${countDoneDocs()}/${reqs.length})</h4>
           <div style="display:grid;gap:.45rem;">
             ${reqs.map(r => {
               const u = appState.uploadedDocs[r.id];
               const ok = u && u.uploaded;
               return `<div style="display:flex;justify-content:space-between;padding:.5rem .7rem;background:${ok ? '#F0FFF4' : '#FFF5F5'};border-radius:10px;font-size:.85rem;border:1px solid ${ok ? '#C6F6D5' : '#FED7D7'};">
                 <span>${r.icon} ${r.title}</span>
-                <strong style="color:${ok ? '#38A169' : 'var(--red)'};">${ok ? '✔ Submitted' : '❌ Missing'}</span>
+                <strong style="color:${ok ? '#38A169' : 'var(--red)'};">${ok ? 'âœ” Submitted' : 'âŒ Missing'}</span>
               </div>`;
             }).join('')}
           </div>
@@ -810,8 +983,8 @@
     const record = {
       reference: ref,
       package: `${meta.flag} ${meta.title}`,
-      applicant: appState.personalInfo.fullName || '—',
-      email: appState.personalInfo.email || '—',
+      applicant: appState.personalInfo.fullName || 'â€”',
+      email: appState.personalInfo.email || 'â€”',
       status: 'Submitted for review',
       progress: 20,
       lastUpdated: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
@@ -823,8 +996,8 @@
     $('#booking-ref').textContent = ref;
     $('#success-summary').innerHTML = `
       <div><span>Package</span><strong>${meta.flag} ${meta.title}</strong></div>
-      <div><span>Applicant</span><strong>${appState.personalInfo.fullName || '—'}</strong></div>
-      <div><span>Email</span><strong>${appState.personalInfo.email || '—'}</strong></div>
+      <div><span>Applicant</span><strong>${appState.personalInfo.fullName || 'â€”'}</strong></div>
+      <div><span>Email</span><strong>${appState.personalInfo.email || 'â€”'}</strong></div>
       <div><span>Application Status</span><strong>Submitted for review</strong></div>
       <div><span>Estimated Fees</span><strong>${money(total, currency)}</strong></div>
       <div class="success-note" style="border-top:1px dashed var(--skyblue-soft);padding-top:.6rem;margin-top:.6rem;color:#0C5A8F;font-weight:700;">A consultant will contact you shortly with next steps and a full fee breakdown.</div>
@@ -871,6 +1044,13 @@
           }
           if (map[target]) smoothScrollTo(map[target]);
         }, 50);
+        return;
+      }
+
+      const tourAction = e.target.closest('[data-tour-action]');
+      if (tourAction) {
+        e.preventDefault();
+        toggleTourCollection(tourAction.getAttribute('data-tour-action'), tourAction.getAttribute('data-tour-id'));
         return;
       }
 
@@ -968,7 +1148,7 @@
         e.preventDefault();
         const btn = contactForm.querySelector('button');
         const original = btn.textContent;
-        btn.textContent = '✓ Message Sent!';
+        btn.textContent = 'âœ“ Message Sent!';
         btn.disabled = true;
         contactForm.reset();
         setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 3000);
@@ -982,7 +1162,7 @@
         const btn = leadForm.querySelector('button');
         const success = $('#lead-form-success');
         const original = btn.textContent;
-        btn.textContent = '✓ Request Received';
+        btn.textContent = 'âœ“ Request Received';
         btn.disabled = true;
         success.style.display = 'block';
         leadForm.reset();
@@ -1021,7 +1201,7 @@
       const success = $('#newsletter-success');
       const btn = form.querySelector('button');
       const original = btn.textContent;
-      btn.textContent = '✓ Subscribed!';
+      btn.textContent = 'âœ“ Subscribed!';
       btn.disabled = true;
       success.style.display = 'block';
       form.reset();
@@ -1049,6 +1229,7 @@
    * JOBS BOARD
    * ============================================== */
   const JOB_API = '/api/jobs';
+  let jobsInitialized = false;
 
   function getJobsSource() {
     return window.JOBS_DATA || [];
@@ -1060,22 +1241,20 @@
     if (!wrapper) return;
     const items = list || filterJobs();
     wrapper.innerHTML = items.map(j => {
-      // Calculate original price (15% higher than current)
-      const originalPrice = j.salary ? 
-        (parseInt(j.salary.replace(/[^0-9]/g, '')) * 1.15).toLocaleString('en-US') : null;
       const currentPrice = j.salary ? j.salary.split(' /')[0] : 'Contact';
+      const imageUrl = j.image || '';
       
       return `
       <div class="swiper-slide">
         <div class="job-card-oval" data-job="${j.id}">
-          <img src="${flagUrl(j.title + ' in ' + j.country)}" alt="${j.title}" class="job-card-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%234FB3D9%22 width=%22400%22 height=%22300%22/%3E%3C/svg%3E'" />
+          ${imageUrl ? `<div class="job-card-image img-wrap"><img src="${imageUrl}" alt="${j.title}" class="job-card-img" style="object-position:${j.imagePosition || 'center'}" loading="lazy" decoding="async" /></div>` : ''}
           <h3 class="job-card-title">${j.title}</h3>
-          <div class="job-card-country">📍 ${j.country}</div>
+          <div class="job-card-country">ðŸ“ ${j.country}</div>
           <div class="job-card-pricing">
-            ${originalPrice ? `<span class="job-card-price-original">$${originalPrice}</span>` : ''}
             <span class="job-card-price-current">${currentPrice}</span>
           </div>
-          <button class="btn btn-gold btn-sm job-card-btn" data-apply="${j.id}">⚡ Quick Apply</button>
+          <p class="job-card-description">${j.description}</p>
+          <a class="btn btn-gold btn-sm job-card-btn" href="apply.html?job=${encodeURIComponent(j.id)}">Apply</a>
         </div>
       </div>
     `;
@@ -1148,7 +1327,7 @@
     if (!job) return;
     const modal = $('#apply-modal');
     const title = $('#apply-job-title');
-    if (title) title.textContent = `${job.flag || '💼'} ${job.title} — ${job.country}`;
+    if (title) title.textContent = `${job.flag || 'ðŸ’¼'} ${job.title} â€” ${job.country}`;
     const form = $('#apply-form');
     if (form) form.reset();
     const success = $('#apply-success');
@@ -1187,6 +1366,8 @@
   }
 
   function initJobs() {
+    if (jobsInitialized) return;
+    jobsInitialized = true;
     populateCountryFilter();
     renderJobs();
 
@@ -1305,7 +1486,7 @@
         }).catch(() => ({ ok: true })); // Fallback to success
         
         if (res.ok) {
-          showToast('✅ Application submitted successfully!', 'success');
+          showToast('âœ… Application submitted successfully!', 'success');
           form.style.display = 'none';
           const success = $('#apply-form-success');
           if (success) success.style.display = 'block';
@@ -1317,11 +1498,11 @@
           }, 3000);
         } else {
           if (errEl) { errEl.textContent = 'Failed to submit application. Please try again.'; errEl.style.display = 'block'; }
-          showToast('❌ Failed to submit application', 'error');
+          showToast('âŒ Failed to submit application', 'error');
         }
       } catch (err) {
         if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
-        showToast('❌ Network error: ' + err.message, 'error');
+        showToast('âŒ Network error: ' + err.message, 'error');
       }
     });
   }
@@ -1371,7 +1552,7 @@
         }).catch(() => ({ ok: true })); // Fallback to success
         
         if (res.ok) {
-          showToast('✅ Visa application submitted successfully!', 'success');
+          showToast('âœ… Visa application submitted successfully!', 'success');
           form.style.display = 'none';
           const success = $('#visa-form-success');
           if (success) success.style.display = 'block';
@@ -1383,11 +1564,11 @@
           }, 3000);
         } else {
           if (errEl) { errEl.textContent = 'Failed to submit visa application. Please try again.'; errEl.style.display = 'block'; }
-          showToast('❌ Failed to submit visa application', 'error');
+          showToast('âŒ Failed to submit visa application', 'error');
         }
       } catch (err) {
         if (errEl) { errEl.textContent = 'Network error. Please check your connection.'; errEl.style.display = 'block'; }
-        showToast('❌ Network error: ' + err.message, 'error');
+        showToast('âŒ Network error: ' + err.message, 'error');
       }
     });
   }
@@ -1419,7 +1600,7 @@
         const data = await res.json().catch(() => ({}));
         
         if (res.ok && data.user) {
-          showToast('✅ Login successful!', 'success');
+          showToast('âœ… Login successful!', 'success');
           
           // Store auth token
           localStorage.setItem('auth_token', data.token);
@@ -1436,12 +1617,12 @@
         } else {
           const errorMsg = data.message || 'Login failed. Please check your email and password.';
           if (errEl) { errEl.textContent = errorMsg; errEl.style.display = 'block'; }
-          showToast('❌ ' + errorMsg, 'error');
+          showToast('âŒ ' + errorMsg, 'error');
         }
       } catch (err) {
         const errorMsg = 'Network error. Please check your connection.';
         if (errEl) { errEl.textContent = errorMsg; errEl.style.display = 'block'; }
-        showToast('❌ ' + errorMsg, 'error');
+        showToast('âŒ ' + errorMsg, 'error');
       }
     });
   }
@@ -1499,11 +1680,11 @@
       if (!res.ok) {
         const errorMsg = data.message || 'Registration failed. Please try again.';
         if (errEl) { errEl.textContent = errorMsg; errEl.style.display = 'block'; }
-        showToast('❌ ' + errorMsg, 'error');
+        showToast('âŒ ' + errorMsg, 'error');
         return;
       }
       
-      showToast('✅ Agent registration successful!', 'success');
+      showToast('âœ… Agent registration successful!', 'success');
       
       // Store auth token
       localStorage.setItem('auth_token', data.token);
@@ -1521,7 +1702,7 @@
       }, 2000);
     } catch (e) {
       if (errEl) { errEl.textContent = 'Network error. Please try again.'; errEl.style.display = 'block'; }
-      showToast('❌ Network error: ' + e.message, 'error');
+      showToast('âŒ Network error: ' + e.message, 'error');
     }
   }
 
@@ -1604,7 +1785,7 @@
           <span class="candidate-name">${c.candidateName}</span>
           <span class="candidate-status ${(c.status || '').toLowerCase()}">${c.status || 'Submitted'}</span>
         </div>
-        <div class="candidate-info">${c.countryInterest} · ${c.visaType} · ${c.candidateEmail}</div>
+        <div class="candidate-info">${c.countryInterest} Â· ${c.visaType} Â· ${c.candidateEmail}</div>
         <div class="candidate-info">${c.createdAt ? 'Submitted ' + new Date(c.createdAt).toLocaleDateString() : ''}</div>
       </div>
     `).join('');
@@ -1703,7 +1884,6 @@
   /* ==============================================
    * WHATSAPP AI CONSULTATION
    * ============================================== */
-  const WA_PHONE = '254705205903';
   const WA_STATE = {
     step: 'greeting',
     dest: '', dates: '', group: '', budget: ''
@@ -1752,7 +1932,8 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
     // Human handoff
     if (/(human|agent|person|represent|officer)/.test(t)) {
       WA_STATE.step = 'handoff';
-      waAddMsg(`You'll be connected to a human agent shortly. Meanwhile, you can also reach us directly on WhatsApp: <a href="https://wa.me/${WA_PHONE}" target="_blank" rel="noopener" style="color:#00ff88;">Chat now</a> &#128242;`);
+      const message = 'Hello Pascal Travels, I would like to speak with a travel consultant.';
+      waAddMsg(`You'll be connected to a human agent shortly. <a href="${window.PascalWhatsApp.createWhatsAppUrl(message)}" target="_blank" rel="noopener" style="color:#00ff88;">Continue on WhatsApp</a>.`);
       return;
     }
 
@@ -1762,12 +1943,12 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
       job: 'Job Abroad',
       study: 'Study',
       pr: 'Canada PR',
-      tour: 'East Africa Tour',
+      tour: 'Africa Tour',
       human: 'Human'
     };
 
     if (state.step === 'greeting') {
-      // First message — capture destination
+      // First message â€” capture destination
       let destination = userText.trim();
       // If they clicked a quick option, use that as their service focus
       for (const [key, label] of Object.entries(quickMap)) {
@@ -1776,28 +1957,29 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
       if (!destination) destination = 'your chosen destination';
       state.dest = destination;
       state.step = 'dates';
-      waAddMsg(`Great choice! &#127758; <strong>${waQuote(destination)}</strong> — excellent pick!\n\nFor your consultation, could you tell me your preferred <strong>travel dates</strong>? (e.g. "March 2026")`);
+      waAddMsg(`Great choice! &#127758; <strong>${waQuote(destination)}</strong> â€” excellent pick!\n\nFor your consultation, could you tell me your preferred <strong>travel dates</strong>? (e.g. "March 2026")`);
       return;
     }
 
     if (state.step === 'dates') {
       state.dates = userText.trim() || 'Flexible';
       state.step = 'group';
-      waAddMsg(`Got it — <strong>${waQuote(state.dates)}</strong>. &#128197;\n\nHow many people are traveling? <strong>Group size</strong>? (e.g. "2 adults + 1 child" or "Just me")`);
+      waAddMsg(`Got it â€” <strong>${waQuote(state.dates)}</strong>. &#128197;\n\nHow many people are traveling? <strong>Group size</strong>? (e.g. "2 adults + 1 child" or "Just me")`);
       return;
     }
 
     if (state.step === 'group') {
       state.group = userText.trim() || '1 person';
       state.step = 'budget';
-      waAddMsg(`Perfect — <strong>${waQuote(state.group)}</strong>. &#128106;\n\nLastly, what's your approximate <strong>budget</strong>? (e.g. "KSh 150,000" or "$2,000")`);
+      waAddMsg(`Perfect â€” <strong>${waQuote(state.group)}</strong>. &#128106;\n\nLastly, what's your approximate <strong>budget</strong>? (e.g. "KSh 150,000" or "$2,000")`);
       return;
     }
 
     if (state.step === 'budget') {
       state.budget = userText.trim() || 'To be discussed';
       state.step = 'done';
-      waAddMsg(`Thank you! &#128640; Here's your consultation summary:\n\n&#128205; <strong>Destination:</strong> ${waQuote(state.dest)}\n&#128197; <strong>Dates:</strong> ${waQuote(state.dates)}\n&#128106; <strong>Group:</strong> ${waQuote(state.group)}\n&#128176; <strong>Budget:</strong> ${waQuote(state.budget)}\n\nI've qualified your lead and recommend you book a <strong>free video consultation</strong> with our experts. &#128073; <a href="https://wa.me/${WA_PHONE}?text=${encodeURIComponent('Hello Pascal Travels, I would like to book a consultation for ' + state.dest + ' on ' + state.dates + ' for ' + state.group + ' with a budget of ' + state.budget)}" target="_blank" rel="noopener" style="color:#00ff88;">Confirm booking on WhatsApp</a> &#128242;\n\nAlternatively, choose an option below to continue.`);
+      const whatsappMessage = `Consultation request\nDestination: ${state.dest}\nDates: ${state.dates}\nGroup: ${state.group}\nBudget: ${state.budget}`;
+      waAddMsg(`Thank you! &#128640; Here's your consultation summary:\n\n&#128205; <strong>Destination:</strong> ${waQuote(state.dest)}\n&#128197; <strong>Dates:</strong> ${waQuote(state.dates)}\n&#128106; <strong>Group:</strong> ${waQuote(state.group)}\n&#128176; <strong>Budget:</strong> ${waQuote(state.budget)}\n\n<a href="${window.PascalWhatsApp.createWhatsAppUrl(whatsappMessage)}" target="_blank" rel="noopener" style="color:#00ff88;">Send this request on WhatsApp</a>`);
       return;
     }
 
@@ -1807,12 +1989,12 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
 
   function waHandleQuick(option) {
     const map = {
-      visa: '🛂 Visa',
-      job: '💼 Job Abroad',
-      study: '🎓 Study',
-      pr: '🍁 Canada PR',
-      tour: '🌍 East Africa Tour',
-      human: '🧑‍💼 Talk to Human'
+      visa: 'ðŸ›‚ Visa',
+      job: 'ðŸ’¼ Job Abroad',
+      study: 'ðŸŽ“ Study',
+      pr: 'ðŸ Canada PR',
+      tour: 'ðŸŒ Africa Tour',
+      human: 'ðŸ§‘â€ðŸ’¼ Talk to Human'
     };
     const label = map[option] || option;
     waAddMsg(label, 'user');
@@ -1918,7 +2100,7 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
     
     try {
       const res = await fetch(`${AGENT_API}/${session.id}/candidates`, {
-        headers: { 'Authorization': `Bearer ${session.token}` }
+        headers: { 'Authorization': Bearer  }
       });
       const data = await res.json().catch(() => ({ candidates: [] }));
       const candidates = data.candidates || [];
@@ -1962,18 +2144,18 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
 
     const btn = form.querySelector('button[type="submit"]');
     const original = btn.textContent;
-    btn.textContent = '⏳ Submitting...';
+    btn.textContent = 'â³ Submitting...';
     btn.disabled = true;
 
     try {
       const res = await fetch(`${AGENT_API}/${session.id}/candidates`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.token}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': Bearer  },
         body: JSON.stringify(payload)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { alert(data.error || 'Submission failed'); btn.textContent = original; btn.disabled = false; return; }
-      alert('✓ Candidate submitted for review!');
+      alert('âœ“ Candidate submitted for review!');
       form.reset();
       loadAgentCandidates();
       btn.textContent = original;
@@ -2027,13 +2209,51 @@ function waQuote(text) { return String(text).replace(/&/g, '&amp;').replace(/</g
     }
   }
 
+  function addStructuredData() {
+    const packages = [...(PKG.travelVisas || []), ...(PKG.workVisas || []), ...(PKG.studyVisas || []), ...(PKG.canadaPR || [])];
+    const graph = [
+      ...(PKG.eastAfricaTours || []).map(tour => ({
+        '@type': 'TouristTrip',
+        name: tour.destination,
+        description: tour.description,
+        provider: { '@type': 'TravelAgency', name: 'Pascal Travels & Tour', url: 'https://pascaltravels.com/' },
+        offers: { '@type': 'Offer', priceCurrency: tour.currency || 'USD', price: tour.pricePerPerson, availability: 'https://schema.org/InStock' }
+      })),
+      ...packages.map(visa => ({
+        '@type': 'Service',
+        name: `${visa.country || visa.stream} visa support`,
+        description: visa.description,
+        provider: { '@type': 'TravelAgency', name: 'Pascal Travels & Tour' },
+        offers: { '@type': 'Offer', priceCurrency: visa.processingCurrency || 'USD', price: visa.priceProcessing || visa.pricePerPerson || 0 }
+      })),
+      ...(window.JOBS_DATA || []).map(job => ({
+        '@type': 'JobPosting',
+        title: job.title,
+        description: job.description,
+        datePosted: job.created_at,
+        employmentType: job.type,
+        hiringOrganization: { '@type': 'Organization', name: 'Pascal Travels & Tour' },
+        jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressCountry: job.country } }
+      }))
+    ];
+    const script = document.createElement('script');
+    script.id = 'dynamic-structured-data';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
+    document.head.appendChild(script);
+  }
+
   function init() {
+    addStructuredData();
     renderServices();
     renderVisaPackages('travel');
-    renderTours();
+    initTourSearch();
+    renderTours(appState.tourSearch);
+    if (document.body.dataset.page === 'jobs' && $('#jobs-swiper-wrapper')) initJobs();
+    renderTourComparison();
     renderDubaiPackages();
     renderCanadaVisual();
-    renderCompactBrandLogo();
+    initWhatsApp();
     attachGlobalHandlers();
     initQuickApplyForm();
     initVisaApplicationForm();
