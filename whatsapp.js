@@ -1,8 +1,8 @@
 (function () {
-  const phone = '25411836557';
+  const phone = '254118363557';
 
-  function createWhatsAppUrl(message) {
-    return `https://wa.me/${phone}?text=${encodeURIComponent(String(message || ''))}`;
+  function createWhatsAppUrl() {
+    return `https://wa.me/${phone}`;
   }
 
   window.PascalWhatsApp = Object.freeze({ createWhatsAppUrl });
