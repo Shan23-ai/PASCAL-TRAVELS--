@@ -19,7 +19,7 @@ window.JOBS_DATA = [
       'Proficiency in JavaScript / Python / Java',
       'Work permit sponsorship available'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Software%20Engineer%20(Canada)',
+    application_link: 'apply.html?job=job-canada-software',
     created_at: '2026-01-01'
   },
   {
@@ -37,7 +37,7 @@ window.JOBS_DATA = [
       'IELTS OET (minimum C+)',
       'Relocation assistance provided'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Registered%20Nurse%20(UK)',
+    application_link: 'apply.html?job=job-uk-nurse',
     created_at: '2026-01-01'
   },
   {
@@ -55,7 +55,7 @@ window.JOBS_DATA = [
       'Physical fitness and safety awareness',
       'Employer sponsorship available'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Construction%20Worker%20(Australia)',
+    application_link: 'apply.html?job=job-australia-construction',
     created_at: '2026-01-01'
   },
   {
@@ -73,7 +73,7 @@ window.JOBS_DATA = [
       '2+ years teaching experience',
       'Tax-free salary + housing allowance'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Teacher%20(UAE)',
+    application_link: 'apply.html?job=job-uae-teacher',
     created_at: '2026-01-01'
   },
   {
@@ -91,7 +91,7 @@ window.JOBS_DATA = [
       'English B2 / German advantageous',
       'EU Blue Card sponsorship available'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Mechanical%20Engineer%20(Germany)',
+    application_link: 'apply.html?job=job-germany-engineer',
     created_at: '2026-01-01'
   },
   {
@@ -109,12 +109,12 @@ window.JOBS_DATA = [
       'Accommodation & transport provided',
       'Valid passport (6+ months)'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Hospitality%20Staff%20(Qatar)',
+    application_link: 'apply.html?job=job-qatar-hospitality',
     created_at: '2026-01-01'
   },
   {
     id: 'job-saudi-healthcare',
-    title: 'Healthcare Assistant',
+    title: 'Healthcare Assistance',
     country: 'Saudi Arabia',
     flag: '🇸🇦',
     city: 'Riyadh / Jeddah',
@@ -127,7 +127,7 @@ window.JOBS_DATA = [
       'Free accommodation & transport',
       'Valid passport (6+ months)'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20Healthcare%20Assistant%20(Saudi%20Arabia)',
+    application_link: 'apply.html?job=job-saudi-healthcare',
     created_at: '2026-01-01'
   },
   {
@@ -145,7 +145,33 @@ window.JOBS_DATA = [
       'Windows / Linux knowledge',
       'Type D visa support provided'
     ],
-    application_link: 'mailto:Pascaltravelsdocs@gmail.com?subject=Application%20-%20IT%20Support%20(Canada)',
+    application_link: 'apply.html?job=job-estonia-it',
     created_at: '2026-01-01'
   }
 ];
+
+const localJobImages = {
+  'job-canada-software': 'images/jobs/SOFT.jpg',
+  'job-uk-nurse': 'images/jobs/NURSE.jpg',
+  'job-australia-construction': 'images/jobs/CWO.jpg',
+  'job-uae-teacher': 'images/jobs/Teach.jpg',
+  'job-germany-engineer': 'images/jobs/Mech.jpg',
+  'job-qatar-hospitality': 'images/jobs/Hos.jpg',
+  'job-saudi-healthcare': 'images/jobs/Health.jpg',
+  'job-estonia-it': 'images/jobs/IT.jpg'
+};
+const localJobImagePositions = {
+  'job-canada-software': '38% center',
+  'job-uk-nurse': '72% center',
+  'job-australia-construction': 'center center',
+  'job-uae-teacher': '40% 42%',
+  'job-germany-engineer': '38% center',
+  'job-qatar-hospitality': 'center center',
+  'job-saudi-healthcare': '58% center',
+  'job-estonia-it': '38% center'
+};
+
+window.JOBS_DATA.forEach(job => {
+  job.image = localJobImages[job.id] || '';
+  job.imagePosition = localJobImagePositions[job.id] || 'center';
+});

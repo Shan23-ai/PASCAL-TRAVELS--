@@ -200,7 +200,7 @@ class BuupassPaymentService {
     window.dispatchEvent(event);
     
     // Show success message
-    alert(`✅ Payment successful! Transaction ID: ${data.transactionId}`);
+    alert(`âœ… Payment successful! Transaction ID: ${data.transactionId}`);
   }
 
   /**
@@ -212,7 +212,7 @@ class BuupassPaymentService {
     window.dispatchEvent(event);
     
     // Show error message
-    alert(`❌ Payment failed. Please try again or contact support.`);
+    alert(`âŒ Payment failed. Please try again or contact support.`);
   }
 
   /**

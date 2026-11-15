@@ -1,14 +1,14 @@
 /**
  * PesaLink (DIB Kenya) Payment Service
  * =====================================
- * DIB Kenya is on the PesaLink interbank network — real-time transfers
+ * DIB Kenya is on the PesaLink interbank network â€” real-time transfers
  * up to KSh 300,000 per transaction, 24/7, including weekends & holidays.
  *
  * DIB has NO public merchant API. Two integration paths:
  *
  *   [A] AGGREGATOR (recommended for full automation)
  *       Use a CBK-licensed PSP that already supports PesaLink:
- *         - SasaPay      (https://sasapay.app  — sandbox: sandbox.sasapay.app)
+ *         - SasaPay      (https://sasapay.app  â€” sandbox: sandbox.sasapay.app)
  *         - Cellulant Tingg (https://developer.tingg.africa)
  *         - iPay Kenya   (https://ipayafrica.com)
  *       Customer is redirected to the aggregator's hosted page (or a
@@ -20,8 +20,8 @@
  *       their own bank app, submits a notification form, and staff verify
  *       the credit on the DIB statement before confirming the booking.
  *
- * Status flow: PENDING → PROCESSING → AWAITING_CONFIRMATION → PAID → COMPLETED
- *              PENDING → FAILED | CANCELLED | EXPIRED
+ * Status flow: PENDING â†’ PROCESSING â†’ AWAITING_CONFIRMATION â†’ PAID â†’ COMPLETED
+ *              PENDING â†’ FAILED | CANCELLED | EXPIRED
  */
 
 'use strict';
@@ -121,7 +121,7 @@ async function initiateSasaPay({ store, payment, booking, amount }) {
     merchantCode: config.pesalink.merchantCode,
     amount: Number(amount).toFixed(2),
     currency: 'KES',
-    description: `Pascal Travels — ${booking.packageTitle}`,
+    description: `Pascal Travels â€” ${booking.packageTitle}`,
     reference,
     callbackUrl: `${config.appUrl}/api/webhooks/pesalink/sasapay`,
     customer: booking.applicantName
@@ -129,10 +129,10 @@ async function initiateSasaPay({ store, payment, booking, amount }) {
 
   try {
     const resp = await axios.post(url, payload, {
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-    });
-
-    const d = resp.data;
+      headers: {
+        Authorization: `Bearer ${config.pesalink.clientSecret}`,
+        'Content-Type': 'application/json'
+      }
     const providerRef = d.transactionId || d.reference || reference;
     const paymentUrl = d.paymentUrl || d.redirectUrl || '';
 
@@ -164,7 +164,7 @@ async function initiateTingg({ store, payment, booking, amount }) {
     serviceCode: config.pesalink.merchantCode,
     requestAmount: Number(amount).toFixed(2),
     currencyCode: 'KES',
-    requestDescription: `Pascal Travels — ${booking.packageTitle}`,
+    requestDescription: `Pascal Travels â€” ${booking.packageTitle}`,
     msisdn: booking.phone || '',
     channel: 'PESALINK',
     countryCode: 'KE',
@@ -222,7 +222,7 @@ async function notifyManualTransfer({ instructionId, senderName, senderBank, sen
     throw err;
   }
   if (instruction.status !== 'AWAITING_CONFIRMATION') {
-    const err = new Error(`Instruction already ${instruction.status.toLowerCase()} — nothing to update.`);
+    const err = new Error(`Instruction already ${instruction.status.toLowerCase()} â€” nothing to update.`);
     err.status = 409;
     throw err;
   }
@@ -540,4 +540,3 @@ module.exports = {
   pesalinkErrorHandler,
   SAMPLE_PAYLOADS
 };
-
