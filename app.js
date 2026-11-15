@@ -1249,7 +1249,7 @@
         <div class="job-card-oval" data-job="${j.id}">
           ${imageUrl ? `<div class="job-card-image img-wrap"><img src="${imageUrl}" alt="${j.title}" class="job-card-img" style="object-position:${j.imagePosition || 'center'}" loading="lazy" decoding="async" /></div>` : ''}
           <h3 class="job-card-title">${j.title}</h3>
-          <div class="job-card-country">ðŸ“ ${j.country}</div>
+          <div class="job-card-country">${j.country}</div>
           <div class="job-card-pricing">
             <span class="job-card-price-current">${currentPrice}</span>
           </div>

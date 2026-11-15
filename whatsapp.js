@@ -1,5 +1,5 @@
 (function () {
-  const phone = '254118365557';
+  const phone = '25411836557';
 
   function createWhatsAppUrl(message) {
     return `https://wa.me/${phone}?text=${encodeURIComponent(String(message || ''))}`;
